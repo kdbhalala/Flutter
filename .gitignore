@@ -1,0 +1,16 @@
+# Rust build artifacts
+/target/
+Cargo.lock
+
+# Zed extension build output
+*.wasm
+
+# code-review-graph
+.code-review-graph/
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+*.swp

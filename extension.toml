@@ -1,0 +1,19 @@
+id = "flutter"
+name = "Flutter"
+description = "Flutter and Dart support for Zed: LSP, tasks, hot reload, and debugging."
+version = "0.1.0"
+schema_version = 1
+authors = ["Krunal Bhalala <kdbhalala@gmail.com>"]
+repository = "https://github.com/krunalbhalala/zed-flutter"
+
+[language_servers.dart]
+name = "Dart LSP"
+language = "Dart"
+languages = ["Dart"]
+
+[grammars.dart]
+repository = "https://github.com/UserNobody14/tree-sitter-dart"
+commit = "0fc19c3a57b1109802af41d2b8f60d8835c5da3a"
+
+[debug_adapters.Flutter]
+schema_path = "debug_adapter_schemas/Flutter.json"

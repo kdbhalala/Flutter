@@ -1,0 +1,116 @@
+[
+  {
+    "label": "flutter: run",
+    "command": "flutter",
+    "args": ["run"],
+    "tags": ["flutter-run"]
+  },
+  {
+    "label": "flutter: run (release)",
+    "command": "flutter",
+    "args": ["run", "--release"],
+    "tags": ["flutter-run-release"]
+  },
+  {
+    "label": "flutter: pub get",
+    "command": "flutter",
+    "args": ["pub", "get"],
+    "tags": ["flutter-pub-get"]
+  },
+  {
+    "label": "flutter: pub upgrade",
+    "command": "flutter",
+    "args": ["pub", "upgrade"],
+    "tags": ["flutter-pub-upgrade"]
+  },
+  {
+    "label": "flutter: build apk",
+    "command": "flutter",
+    "args": ["build", "apk"],
+    "tags": ["flutter-build-apk"]
+  },
+  {
+    "label": "flutter: build ios",
+    "command": "flutter",
+    "args": ["build", "ios"],
+    "tags": ["flutter-build-ios"]
+  },
+  {
+    "label": "flutter: build web",
+    "command": "flutter",
+    "args": ["build", "web"],
+    "tags": ["flutter-build-web"]
+  },
+  {
+    "label": "flutter: test",
+    "command": "flutter",
+    "args": ["test"],
+    "tags": ["flutter-test"]
+  },
+  {
+    "label": "flutter: test $ZED_STEM",
+    "command": "flutter",
+    "args": ["test", "$ZED_FILE"],
+    "tags": ["flutter-test-file"]
+  },
+  {
+    "label": "flutter: clean",
+    "command": "flutter",
+    "args": ["clean"],
+    "tags": ["flutter-clean"]
+  },
+  {
+    "label": "flutter: devices",
+    "command": "flutter",
+    "args": ["devices"],
+    "tags": ["flutter-devices"]
+  },
+  {
+    "label": "flutter: doctor",
+    "command": "flutter",
+    "args": ["doctor"],
+    "tags": ["flutter-doctor"]
+  },
+  {
+    "label": "dart: run $ZED_FILE",
+    "command": "dart",
+    "args": ["run", "$ZED_FILE"],
+    "tags": ["dart-run-file"]
+  },
+  {
+    "label": "dart: test $ZED_STEM",
+    "command": "dart",
+    "args": ["test", "$ZED_FILE"],
+    "tags": ["dart-test-file"]
+  },
+  {
+    "label": "dart: format",
+    "command": "dart",
+    "args": ["format", "."],
+    "tags": ["dart-format"]
+  },
+  {
+    "label": "dart: analyze",
+    "command": "dart",
+    "args": ["analyze"],
+    "tags": ["dart-analyze"]
+  },
+  {
+    "label": "fvm: flutter run",
+    "command": "fvm",
+    "args": ["flutter", "run"],
+    "tags": ["fvm-flutter-run"]
+  },
+  {
+    "label": "fvm: flutter pub get",
+    "command": "fvm",
+    "args": ["flutter", "pub", "get"],
+    "tags": ["fvm-flutter-pub-get"]
+  },
+  {
+    "label": "fvm: flutter test",
+    "command": "fvm",
+    "args": ["flutter", "test"],
+    "tags": ["fvm-flutter-test"]
+  }
+]

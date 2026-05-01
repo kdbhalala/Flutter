@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Flutter Debug Adapter Configuration",
+  "type": "object",
+  "properties": {
+    "adapter": {
+      "type": "string",
+      "enum": ["Flutter"]
+    },
+    "type": {
+      "type": "string",
+      "enum": ["dart", "flutter"],
+      "description": "Debug a Dart CLI app or a Flutter app"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for this debug config"
+    },
+    "program": {
+      "type": "string",
+      "description": "Path to the entry point (e.g. lib/main.dart)",
+      "examples": ["lib/main.dart", "bin/main.dart"]
+    },
+    "cwd": {
+      "type": "string",
+      "description": "Working directory (defaults to workspace root)"
+    },
+    "request": {
+      "type": "string",
+      "enum": ["launch", "attach"],
+      "default": "launch"
+    },
+    "args": {
+      "type": "array",
+      "description": "Additional arguments passed to flutter/dart run",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "device_id": {
+      "type": "string",
+      "description": "Target device ID (from flutter devices)",
+      "examples": ["chrome", "edge", "macos", "ios", "android"]
+    },
+    "useFvm": {
+      "type": "boolean",
+      "description": "Use fvm to resolve the Flutter SDK version",
+      "default": false
+    },
+    "vmServiceUri": {
+      "type": "string",
+      "description": "VM Service URI for attach mode (e.g. ws://127.0.0.1:12345/...)"
+    },
+    "stopOnEntry": {
+      "type": "boolean",
+      "default": false
+    },
+    "flutterMode": {
+      "type": "string",
+      "enum": ["debug", "profile", "release"],
+      "default": "debug"
+    }
+  },
+  "required": ["program", "adapter"],
+  "additionalProperties": false
+}
