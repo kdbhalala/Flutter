@@ -1,6 +1,6 @@
 id = "flutter"
 name = "Flutter"
-description = "Flutter and Dart support for Zed: LSP, tasks, hot reload, and debugging."
+description = "Full Flutter and Dart support for Zed: LSP (dart analysis server), syntax highlighting, code outline, snippets, tasks, slash commands, hot-reload debugging (Flutter DAP), and Dart CLI debugging."
 version = "0.1.0"
 schema_version = 1
 authors = ["Krunal Bhalala <kdbhalala@gmail.com>"]
@@ -34,3 +34,4 @@ tooltip_text = "Run Dart command"
 requires_argument = true
 
 [debug_adapters.Dart]
+label = "Dart / Flutter"

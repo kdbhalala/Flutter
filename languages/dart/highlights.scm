@@ -1,13 +1,153 @@
+; ===== Variables =====
+
 (identifier) @variable
 
-(dotted_identifier_list) @string
+; ===== Keywords =====
 
-; Methods
-(super) @function
+; Control flow keywords
+[
+  (assert_builtin)
+  (break_builtin)
+  (rethrow_builtin)
+  "break"
+  "case"
+  "catch"
+  "continue"
+  "default"
+  "do"
+  "else"
+  "finally"
+  "for"
+  "if"
+  "in"
+  "return"
+  "switch"
+  "throw"
+  "try"
+  "when"
+  "while"
+] @keyword.control
 
-(function_expression_body
-  (identifier) @type)
+; Import / library directives
+[
+  "deferred"
+  "export"
+  "hide"
+  "import"
+  "library"
+  "part"
+  (part_of_builtin)
+  "show"
+] @keyword.import
 
+; Async / generator keywords
+[
+  "async"
+  "async*"
+  "await"
+  "sync*"
+  "yield"
+] @keyword
+
+; Declaration and modifier keywords
+[
+  "abstract"
+  "as"
+  "base"
+  "class"
+  (const_builtin)
+  "covariant"
+  "enum"
+  "extends"
+  "extension"
+  "external"
+  "factory"
+  "final"
+  "Function"
+  "get"
+  "implements"
+  (inferred_type)
+  "interface"
+  "is"
+  "late"
+  "mixin"
+  "new"
+  "on"
+  "operator"
+  "required"
+  "sealed"
+  "set"
+  "static"
+  "super"
+  "this"
+  "typedef"
+  "var"
+  (void_type)
+  "with"
+] @keyword
+
+; "this" and "super" are special built-in variables, not plain keywords
+(this) @variable.special
+(super) @variable.special
+
+; ===== Types =====
+
+(type_identifier) @type
+
+; Built-in Dart types
+((type_identifier) @type.builtin
+  (#match? @type.builtin "^(bool|double|Duration|dynamic|Enum|Error|Exception|Function|Future|int|Iterable|Iterator|List|Map|Never|Null|num|Object|Record|RegExp|Runes|Set|StackTrace|Stream|String|Symbol|Type|Uri)$"))
+
+; Class / mixin / enum / extension names
+(class_definition
+  name: (identifier) @type)
+
+(mixin_declaration
+  name: (identifier) @type)
+
+(enum_declaration
+  name: (identifier) @type)
+
+(extension_declaration
+  name: (identifier) @type)
+
+; Typedef targets
+(type_alias
+  (type_identifier) @type)
+
+; Scoped identifier scope is usually a type (e.g. MyClass.method)
+(scoped_identifier
+  scope: (identifier) @type)
+
+((scoped_identifier
+  scope: (identifier) @type
+  name: (identifier) @type)
+  (#match? @type "^[a-zA-Z]"))
+
+; Capitalized identifiers are typically types
+((identifier) @type
+  (#match? @type "^_?[A-Z].*[a-z]"))
+
+; ===== Constructors =====
+
+(constructor_signature
+  name: (identifier) @constructor)
+
+(factory_constructor_signature
+  (identifier) @constructor)
+
+; ===== Functions / Methods =====
+
+(function_signature
+  name: (identifier) @function)
+
+(getter_signature
+  (identifier) @function)
+
+(setter_signature
+  name: (identifier) @function)
+
+; Function calls (heuristic: lowercase identifier immediately before argument list)
 (((identifier) @function
   (#match? @function "^_?[a-z]"))
   .
@@ -15,112 +155,7 @@
     .
     (argument_part))) @function
 
-; Operators
-(template_substitution
-  "$" @punctuation.special
-  "{" @punctuation.special
-  "}" @punctuation.special) @none
-
-(template_substitution
-  "$" @punctuation.special
-  (identifier_dollar_escaped) @variable) @none
-
-(escape_sequence) @string.escape
-
-[
-  "=>"
-  ".."
-  "??"
-  "=="
-  "?"
-  ":"
-  "&&"
-  "%"
-  "<"
-  ">"
-  "="
-  ">="
-  "<="
-  "||"
-  (multiplicative_operator)
-  (increment_operator)
-  (is_operator)
-  (prefix_operator)
-  (equality_operator)
-  (additive_operator)
-] @operator
-
-[
-  "("
-  ")"
-  "["
-  "]"
-  "{"
-  "}"
-] @punctuation.bracket
-
-[
-  ";"
-  "."
-  ","
-] @punctuation.delimiter
-
-; Types
-(class_definition
-  name: (identifier) @type)
-
-(constructor_signature
-  name: (identifier) @type)
-
-(scoped_identifier
-  scope: (identifier) @type)
-
-(function_signature
-  name: (identifier) @function.method)
-
-(enum_declaration
-  name: (identifier) @type)
-
-(enum_constant
-  name: (identifier) @property)
-
-((scoped_identifier
-  scope: (identifier) @type
-  name: (identifier) @type)
-  (#match? @type "^[a-zA-Z]"))
-
-(type_identifier) @type
-
-(type_alias
-  (type_identifier) @type.definition)
-
-; Variables
-(inferred_type) @keyword
-
-((identifier) @type
-  (#match? @type "^_?[A-Z].*[a-z]"))
-
-; Annotations
-(annotation
-  "@" @attribute
-  name: (identifier) @attribute)
-
-; Properties
-(unconditional_assignable_selector
-  (identifier) @property)
-
-(conditional_assignable_selector
-  (identifier) @property)
-
-(cascade_selector
-  (identifier) @property)
-
-(getter_signature
-  (identifier) @property)
-
-(setter_signature
-  name: (identifier) @property)
-
+; Method calls via chained selectors
 ((selector
   (unconditional_assignable_selector
     (identifier) @function.method))
@@ -158,45 +193,126 @@
     (argument_part
       (arguments))))
 
-; Assignments
-(assignment_expression
-  left: (assignable_expression) @variable)
+; ===== Annotations =====
 
-(this) @variable.builtin
+(annotation
+  "@" @attribute
+  name: (identifier) @attribute)
 
-; Parameters
+; ===== Properties =====
+
+(unconditional_assignable_selector
+  (identifier) @property)
+
+(conditional_assignable_selector
+  (identifier) @property)
+
+(cascade_section
+  (cascade_selector
+    (identifier) @property))
+
+; ===== Enum Members =====
+
+(enum_constant
+  name: (identifier) @constant)
+
+; ===== Parameters =====
+
 (formal_parameter
-  (identifier) @variable.parameter)
+  name: (identifier) @variable.parameter)
 
 (named_argument
   (label
     (identifier) @variable.parameter))
 
-; Literals
+; ===== Assignments =====
+
+(assignment_expression
+  left: (assignable_expression) @variable)
+
+; ===== Operators =====
+
+(template_substitution
+  "$" @punctuation.special
+  "{" @punctuation.special
+  "}" @punctuation.special) @none
+
+(template_substitution
+  "$" @punctuation.special
+  (identifier_dollar_escaped) @variable) @none
+
+(escape_sequence) @string.escape
+
+[
+  "@"
+  "=>"
+  ".."
+  "??="
+  "??"
+  "=="
+  "?"
+  ":"
+  "&&"
+  "%"
+  "<"
+  ">"
+  "="
+  ">="
+  "<="
+  "||"
+  "~/"
+  (multiplicative_operator)
+  (increment_operator)
+  (is_operator)
+  (prefix_operator)
+  (equality_operator)
+  (additive_operator)
+] @operator
+
+; Type argument / parameter angle brackets are punctuation
+(type_arguments
+  "<" @punctuation.bracket
+  ">" @punctuation.bracket)
+
+(type_parameters
+  "<" @punctuation.bracket
+  ">" @punctuation.bracket)
+
+; ===== Punctuation =====
+
+[
+  "("
+  ")"
+  "["
+  "]"
+  "{"
+  "}"
+] @punctuation.bracket
+
+[
+  ";"
+  "."
+  ","
+] @punctuation.delimiter
+
+; ===== Literals =====
+
 [
   (hex_integer_literal)
   (decimal_integer_literal)
   (decimal_floating_point_literal)
 ] @number
 
-(symbol_literal) @string.special.symbol
 (string_literal) @string
+(symbol_literal) @string.special.symbol
 (true) @boolean
 (false) @boolean
 (null_literal) @constant.builtin
 
-(comment) @comment
-(documentation_comment) @comment.documentation
+; ===== Comments =====
 
-; Keywords - imports
-[
-  "import"
-  "library"
-  "export"
-  "as"
-  "show"
-  "hide"
-] @keyword.import
+(comment) @comment
+(documentation_comment) @comment.doc
 
 ; Keywords - definitions
 [

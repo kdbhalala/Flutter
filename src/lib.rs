@@ -415,6 +415,47 @@ impl zed::Extension for FlutterExtension {
         })
     }
 
+    fn language_server_initialization_options(
+        &mut self,
+        _language_server_id: &zed::LanguageServerId,
+        worktree: &zed::Worktree,
+    ) -> Result<Option<serde_json::Value>> {
+        let user_settings = LspSettings::for_worktree("dart", worktree)
+            .ok()
+            .and_then(|s| s.settings)
+            .and_then(|s| {
+                s.as_object()
+                    .and_then(|o| o.get("dart"))
+                    .and_then(|d| d.as_object())
+                    .map(|o| o.clone())
+            });
+
+        let get_bool = |key: &str, default: bool| -> bool {
+            user_settings
+                .as_ref()
+                .and_then(|s| s.get(key))
+                .and_then(|v| v.as_bool())
+                .unwrap_or(default)
+        };
+
+        Ok(Some(serde_json::json!({
+            // Only analyze Dart projects that have files open in the editor.
+            // This significantly improves performance in multi-project workspaces.
+            "onlyAnalyzeProjectsWithOpenFiles": get_bool("onlyAnalyzeProjectsWithOpenFiles", true),
+            // Surface completion items from libraries not yet imported.
+            // Enables auto-import on accept.
+            "suggestFromUnimportedLibraries": get_bool("suggestFromUnimportedLibraries", true),
+            // Show closing labels for long Flutter widget trees.
+            "closingLabels": get_bool("closingLabels", false),
+            // Enable document outline support.
+            "outline": true,
+            // Enable Flutter widget outline support (widget tree panel).
+            "flutterOutline": true,
+            // Allow the language server to open URIs (for dart fix, etc.).
+            "allowOpenUri": true,
+        })))
+    }
+
     fn language_server_workspace_configuration(
         &mut self,
         _language_server_id: &zed::LanguageServerId,
@@ -733,6 +774,74 @@ impl zed::Extension for FlutterExtension {
                 Some(CodeLabel {
                     filter_range: (0..name.len()).into(),
                     spans: vec![CodeLabelSpan::literal(name, Some("variable".into()))],
+                    code: String::new(),
+                })
+            }
+            // Enum, Interface, Struct, TypeParameter — render like types
+            CompletionKind::Enum
+            | CompletionKind::Interface
+            | CompletionKind::Struct
+            | CompletionKind::TypeParameter => Some(CodeLabel {
+                filter_range: (0..completion.label.len()).into(),
+                spans: vec![CodeLabelSpan::literal(
+                    completion.label,
+                    Some("type".into()),
+                )],
+                code: String::new(),
+            }),
+            // Enum members and constants
+            CompletionKind::EnumMember | CompletionKind::Constant => {
+                let name = completion.label;
+                Some(CodeLabel {
+                    filter_range: (0..name.len()).into(),
+                    spans: vec![CodeLabelSpan::literal(name, Some("constant".into()))],
+                    code: String::new(),
+                })
+            }
+            // Fields render like properties
+            CompletionKind::Field => {
+                let arrow = " → ";
+                let name = completion.label.clone();
+                if let Some(ty) = completion.detail {
+                    let class_start = "class A {";
+                    let get = " get ";
+                    let property_end = " => a; }";
+                    let code = format!("{class_start}{ty}{get}{name}{property_end}");
+                    let name_start = class_start.len() + ty.len() + get.len();
+                    Some(CodeLabel {
+                        spans: vec![
+                            CodeLabelSpan::code_range(name_start..name_start + name.len()),
+                            CodeLabelSpan::literal(arrow, None),
+                            CodeLabelSpan::code_range(
+                                class_start.len()..class_start.len() + ty.len(),
+                            ),
+                        ],
+                        filter_range: (0..name.len()).into(),
+                        code,
+                    })
+                } else {
+                    Some(CodeLabel {
+                        filter_range: (0..name.len()).into(),
+                        spans: vec![CodeLabelSpan::literal(name, Some("property".into()))],
+                        code: String::new(),
+                    })
+                }
+            }
+            // Modules (libraries / packages)
+            CompletionKind::Module => {
+                let name = completion.label;
+                Some(CodeLabel {
+                    filter_range: (0..name.len()).into(),
+                    spans: vec![CodeLabelSpan::literal(name, Some("keyword.import".into()))],
+                    code: String::new(),
+                })
+            }
+            // Keywords
+            CompletionKind::Keyword => {
+                let name = completion.label;
+                Some(CodeLabel {
+                    filter_range: (0..name.len()).into(),
+                    spans: vec![CodeLabelSpan::literal(name, Some("keyword".into()))],
                     code: String::new(),
                 })
             }

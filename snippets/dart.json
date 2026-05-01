@@ -1,0 +1,672 @@
+{
+    "Dart main function": {
+        "prefix": "main",
+        "body": [
+            "void main() {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart main entry point"
+    },
+    "Dart main with arguments": {
+        "prefix": "mainargs",
+        "body": [
+            "void main(List<String> args) {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart main entry point with arguments"
+    },
+    "Dart class": {
+        "prefix": "class",
+        "body": [
+            "class ${1:ClassName} {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart class definition"
+    },
+    "Dart class with constructor": {
+        "prefix": "classc",
+        "body": [
+            "class ${1:ClassName} {",
+            "  ${2:Type} ${3:field};",
+            "",
+            "  ${1:ClassName}({required this.${3:field}});",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart class with a named constructor"
+    },
+    "Dart abstract class": {
+        "prefix": "abstract",
+        "body": [
+            "abstract class ${1:ClassName} {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart abstract class"
+    },
+    "Dart mixin": {
+        "prefix": "mixin",
+        "body": [
+            "mixin ${1:MixinName} {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart mixin"
+    },
+    "Dart enum": {
+        "prefix": "enum",
+        "body": [
+            "enum ${1:EnumName} {",
+            "  ${2:value1},",
+            "  ${3:value2},",
+            "}"
+        ],
+        "description": "Dart enum"
+    },
+    "Dart extension": {
+        "prefix": "extension",
+        "body": [
+            "extension ${1:ExtensionName} on ${2:Type} {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart extension method"
+    },
+    "Dart typedef": {
+        "prefix": "typedef",
+        "body": [
+            "typedef ${1:AliasName} = ${2:Type};"
+        ],
+        "description": "Dart typedef"
+    },
+    "Dart function": {
+        "prefix": "fn",
+        "body": [
+            "${1:void} ${2:functionName}(${3}) {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart function"
+    },
+    "Dart async function": {
+        "prefix": "fnasync",
+        "body": [
+            "Future<${1:void}> ${2:functionName}(${3}) async {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart async function"
+    },
+    "Dart getter": {
+        "prefix": "get",
+        "body": [
+            "${1:Type} get ${2:name} => $0;"
+        ],
+        "description": "Dart getter shorthand"
+    },
+    "Dart setter": {
+        "prefix": "set",
+        "body": [
+            "set ${1:name}(${2:Type} value) {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart setter"
+    },
+    "Dart print": {
+        "prefix": "print",
+        "body": [
+            "print($0);"
+        ],
+        "description": "Print to stdout"
+    },
+    "Dart if": {
+        "prefix": "if",
+        "body": [
+            "if (${1:condition}) {",
+            "  $0",
+            "}"
+        ],
+        "description": "if statement"
+    },
+    "Dart if/else": {
+        "prefix": "ife",
+        "body": [
+            "if (${1:condition}) {",
+            "  $2",
+            "} else {",
+            "  $0",
+            "}"
+        ],
+        "description": "if/else statement"
+    },
+    "Dart for loop": {
+        "prefix": "for",
+        "body": [
+            "for (int ${1:i} = 0; ${1:i} < ${2:count}; ${1:i}++) {",
+            "  $0",
+            "}"
+        ],
+        "description": "for loop"
+    },
+    "Dart for-in loop": {
+        "prefix": "forin",
+        "body": [
+            "for (final ${1:item} in ${2:iterable}) {",
+            "  $0",
+            "}"
+        ],
+        "description": "for-in loop"
+    },
+    "Dart while loop": {
+        "prefix": "while",
+        "body": [
+            "while (${1:condition}) {",
+            "  $0",
+            "}"
+        ],
+        "description": "while loop"
+    },
+    "Dart try/catch": {
+        "prefix": "try",
+        "body": [
+            "try {",
+            "  $1",
+            "} catch (${2:e}) {",
+            "  $0",
+            "}"
+        ],
+        "description": "try/catch block"
+    },
+    "Dart try/catch/finally": {
+        "prefix": "tryf",
+        "body": [
+            "try {",
+            "  $1",
+            "} catch (${2:e}) {",
+            "  $3",
+            "} finally {",
+            "  $0",
+            "}"
+        ],
+        "description": "try/catch/finally block"
+    },
+    "Dart switch": {
+        "prefix": "switch",
+        "body": [
+            "switch (${1:value}) {",
+            "  case ${2:pattern}:",
+            "    $0",
+            "    break;",
+            "  default:",
+            "    break;",
+            "}"
+        ],
+        "description": "switch statement"
+    },
+    "Dart assert": {
+        "prefix": "assert",
+        "body": [
+            "assert(${1:condition}, '${2:message}');"
+        ],
+        "description": "assert statement"
+    },
+    "Dart List": {
+        "prefix": "list",
+        "body": [
+            "final List<${1:Type}> ${2:name} = [$0];"
+        ],
+        "description": "Typed List declaration"
+    },
+    "Dart Map": {
+        "prefix": "map",
+        "body": [
+            "final Map<${1:String}, ${2:dynamic}> ${3:name} = {$0};"
+        ],
+        "description": "Typed Map declaration"
+    },
+    "Dart Set": {
+        "prefix": "set",
+        "body": [
+            "final Set<${1:Type}> ${2:name} = {$0};"
+        ],
+        "description": "Typed Set declaration"
+    },
+    "Dart Future": {
+        "prefix": "future",
+        "body": [
+            "Future<${1:void}> ${2:name}() async {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart Future async function"
+    },
+    "Dart Stream": {
+        "prefix": "stream",
+        "body": [
+            "Stream<${1:Type}> ${2:name}() async* {",
+            "  $0",
+            "}"
+        ],
+        "description": "Dart Stream generator"
+    },
+    "Dart await": {
+        "prefix": "await",
+        "body": [
+            "await $0;"
+        ],
+        "description": "await expression"
+    },
+    "Dart test": {
+        "prefix": "test",
+        "body": [
+            "test('${1:description}', () {",
+            "  $0",
+            "});"
+        ],
+        "description": "Dart test case"
+    },
+    "Dart test async": {
+        "prefix": "testa",
+        "body": [
+            "test('${1:description}', () async {",
+            "  $0",
+            "});"
+        ],
+        "description": "Dart async test case"
+    },
+    "Dart test group": {
+        "prefix": "group",
+        "body": [
+            "group('${1:GroupName}', () {",
+            "  $0",
+            "});"
+        ],
+        "description": "Dart test group"
+    },
+    "Dart expect": {
+        "prefix": "expect",
+        "body": [
+            "expect(${1:actual}, ${2:matcher});"
+        ],
+        "description": "Dart test expectation"
+    },
+    "Dart setUp": {
+        "prefix": "setup",
+        "body": [
+            "setUp(() {",
+            "  $0",
+            "});"
+        ],
+        "description": "Dart test setUp"
+    },
+    "Dart tearDown": {
+        "prefix": "teardown",
+        "body": [
+            "tearDown(() {",
+            "  $0",
+            "});"
+        ],
+        "description": "Dart test tearDown"
+    },
+    "Flutter StatelessWidget": {
+        "prefix": "stless",
+        "body": [
+            "class ${1:MyWidget} extends StatelessWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  Widget build(BuildContext context) {",
+            "    return $0;",
+            "  }",
+            "}"
+        ],
+        "description": "Flutter StatelessWidget"
+    },
+    "Flutter StatefulWidget": {
+        "prefix": "stful",
+        "body": [
+            "class ${1:MyWidget} extends StatefulWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  State<${1:MyWidget}> createState() => _${1:MyWidget}State();",
+            "}",
+            "",
+            "class _${1:MyWidget}State extends State<${1:MyWidget}> {",
+            "  @override",
+            "  Widget build(BuildContext context) {",
+            "    return $0;",
+            "  }",
+            "}"
+        ],
+        "description": "Flutter StatefulWidget"
+    },
+    "Flutter ConsumerWidget (Riverpod)": {
+        "prefix": "stcons",
+        "body": [
+            "class ${1:MyWidget} extends ConsumerWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  Widget build(BuildContext context, WidgetRef ref) {",
+            "    return $0;",
+            "  }",
+            "}"
+        ],
+        "description": "Riverpod ConsumerWidget"
+    },
+    "Flutter ConsumerStatefulWidget (Riverpod)": {
+        "prefix": "stconsful",
+        "body": [
+            "class ${1:MyWidget} extends ConsumerStatefulWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  ConsumerState<${1:MyWidget}> createState() => _${1:MyWidget}State();",
+            "}",
+            "",
+            "class _${1:MyWidget}State extends ConsumerState<${1:MyWidget}> {",
+            "  @override",
+            "  Widget build(BuildContext context) {",
+            "    return $0;",
+            "  }",
+            "}"
+        ],
+        "description": "Riverpod ConsumerStatefulWidget"
+    },
+    "Flutter build method": {
+        "prefix": "build",
+        "body": [
+            "@override",
+            "Widget build(BuildContext context) {",
+            "  return $0;",
+            "}"
+        ],
+        "description": "Flutter build method override"
+    },
+    "Flutter initState": {
+        "prefix": "initstate",
+        "body": [
+            "@override",
+            "void initState() {",
+            "  super.initState();",
+            "  $0",
+            "}"
+        ],
+        "description": "Flutter initState override"
+    },
+    "Flutter dispose": {
+        "prefix": "dispose",
+        "body": [
+            "@override",
+            "void dispose() {",
+            "  $0",
+            "  super.dispose();",
+            "}"
+        ],
+        "description": "Flutter dispose override"
+    },
+    "Flutter setState": {
+        "prefix": "setstate",
+        "body": [
+            "setState(() {",
+            "  $0",
+            "});"
+        ],
+        "description": "Flutter setState call"
+    },
+    "Flutter Scaffold": {
+        "prefix": "scaffold",
+        "body": [
+            "Scaffold(",
+            "  appBar: AppBar(",
+            "    title: const Text('${1:Title}'),",
+            "  ),",
+            "  body: $0,",
+            ")"
+        ],
+        "description": "Flutter Scaffold widget"
+    },
+    "Flutter Container": {
+        "prefix": "container",
+        "body": [
+            "Container(",
+            "  $0",
+            ")"
+        ],
+        "description": "Flutter Container widget"
+    },
+    "Flutter Column": {
+        "prefix": "column",
+        "body": [
+            "Column(",
+            "  children: [",
+            "    $0",
+            "  ],",
+            ")"
+        ],
+        "description": "Flutter Column widget"
+    },
+    "Flutter Row": {
+        "prefix": "row",
+        "body": [
+            "Row(",
+            "  children: [",
+            "    $0",
+            "  ],",
+            ")"
+        ],
+        "description": "Flutter Row widget"
+    },
+    "Flutter Text": {
+        "prefix": "text",
+        "body": [
+            "Text('$0')"
+        ],
+        "description": "Flutter Text widget"
+    },
+    "Flutter ElevatedButton": {
+        "prefix": "btn",
+        "body": [
+            "ElevatedButton(",
+            "  onPressed: () {",
+            "    $0",
+            "  },",
+            "  child: const Text('${1:Label}'),",
+            ")"
+        ],
+        "description": "Flutter ElevatedButton"
+    },
+    "Flutter TextButton": {
+        "prefix": "tbtn",
+        "body": [
+            "TextButton(",
+            "  onPressed: () {",
+            "    $0",
+            "  },",
+            "  child: const Text('${1:Label}'),",
+            ")"
+        ],
+        "description": "Flutter TextButton"
+    },
+    "Flutter SizedBox": {
+        "prefix": "sbox",
+        "body": [
+            "const SizedBox(${1:height}: ${2:16})"
+        ],
+        "description": "Flutter SizedBox spacer"
+    },
+    "Flutter Padding": {
+        "prefix": "padding",
+        "body": [
+            "Padding(",
+            "  padding: const EdgeInsets.${1:all}(${2:16}),",
+            "  child: $0,",
+            ")"
+        ],
+        "description": "Flutter Padding widget"
+    },
+    "Flutter Center": {
+        "prefix": "center",
+        "body": [
+            "Center(",
+            "  child: $0,",
+            ")"
+        ],
+        "description": "Flutter Center widget"
+    },
+    "Flutter Expanded": {
+        "prefix": "expanded",
+        "body": [
+            "Expanded(",
+            "  child: $0,",
+            ")"
+        ],
+        "description": "Flutter Expanded widget"
+    },
+    "Flutter ListView": {
+        "prefix": "listview",
+        "body": [
+            "ListView.builder(",
+            "  itemCount: ${1:items}.length,",
+            "  itemBuilder: (context, index) {",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter ListView.builder"
+    },
+    "Flutter GestureDetector": {
+        "prefix": "gesture",
+        "body": [
+            "GestureDetector(",
+            "  onTap: () {",
+            "    $0",
+            "  },",
+            "  child: ${1:child},",
+            ")"
+        ],
+        "description": "Flutter GestureDetector"
+    },
+    "Flutter testWidgets": {
+        "prefix": "testw",
+        "body": [
+            "testWidgets('${1:description}', (WidgetTester tester) async {",
+            "  await tester.pumpWidget(const ${2:MyApp}());",
+            "  $0",
+            "});"
+        ],
+        "description": "Flutter widget test"
+    },
+    "Flutter find.byType": {
+        "prefix": "findtype",
+        "body": [
+            "find.byType(${1:Widget})"
+        ],
+        "description": "Flutter finder by widget type"
+    },
+    "Flutter find.text": {
+        "prefix": "findtext",
+        "body": [
+            "find.text('${1:text}')"
+        ],
+        "description": "Flutter finder by text"
+    },
+    "Dart doc comment": {
+        "prefix": "doc",
+        "body": [
+            "/// ${1:Description.}",
+            "///${0}"
+        ],
+        "description": "Dart documentation comment"
+    },
+    "Dart override": {
+        "prefix": "override",
+        "body": [
+            "@override",
+            "$0"
+        ],
+        "description": "@override annotation"
+    },
+    "Dart deprecated": {
+        "prefix": "deprecated",
+        "body": [
+            "@Deprecated('${1:Use something else instead}')",
+            "$0"
+        ],
+        "description": "@Deprecated annotation"
+    },
+    "Dart immutable": {
+        "prefix": "immutable",
+        "body": [
+            "@immutable",
+            "$0"
+        ],
+        "description": "@immutable annotation"
+    },
+    "Dart copyWith pattern": {
+        "prefix": "copywith",
+        "body": [
+            "${1:ClassName} copyWith({",
+            "  ${2:Type}? ${3:field},",
+            "}) {",
+            "  return ${1:ClassName}(",
+            "    ${3:field}: ${3:field} ?? this.${3:field},",
+            "  );",
+            "}"
+        ],
+        "description": "Dart copyWith method"
+    },
+    "Dart fromJson": {
+        "prefix": "fromjson",
+        "body": [
+            "factory ${1:ClassName}.fromJson(Map<String, dynamic> json) {",
+            "  return ${1:ClassName}(",
+            "    ${2:field}: json['${3:key}'] as ${4:Type},",
+            "  );",
+            "}"
+        ],
+        "description": "Dart fromJson factory constructor"
+    },
+    "Dart toJson": {
+        "prefix": "tojson",
+        "body": [
+            "Map<String, dynamic> toJson() => {",
+            "  '${1:key}': ${2:field},",
+            "};"
+        ],
+        "description": "Dart toJson method"
+    },
+    "Dart null check": {
+        "prefix": "??",
+        "body": [
+            "${1:expression} ?? $0"
+        ],
+        "description": "Null coalescing operator"
+    },
+    "Dart null-safe access": {
+        "prefix": "?.",
+        "body": [
+            "${1:object}?.${2:property}"
+        ],
+        "description": "Null-safe member access"
+    },
+    "Dart late final": {
+        "prefix": "latefinal",
+        "body": [
+            "late final ${1:Type} ${2:name};"
+        ],
+        "description": "Dart late final variable"
+    },
+    "Dart record type": {
+        "prefix": "record",
+        "body": [
+            "(${1:Type1} ${2:field1}, ${3:Type2} ${4:field2}) ${5:name};"
+        ],
+        "description": "Dart record type variable"
+    }
+}

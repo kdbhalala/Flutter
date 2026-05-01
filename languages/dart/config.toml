@@ -5,6 +5,8 @@ line_comments = ["// ", "/// "]
 tab_size = 2
 hard_tabs = false
 autoclose_before = ";:.,=}])>"
+word_characters = ["_", "$"]
+debuggers = ["Dart"]
 
 brackets = [
     { start = "{", end = "}", close = true, newline = true },
@@ -20,3 +22,9 @@ brackets = [
 [language_servers]
 [language_servers.dart]
 name = "Dart LSP"
+
+[overrides.string]
+completion_query_characters = ["."]
+
+[overrides.comment]
+completion_query_characters = []
