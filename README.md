@@ -55,8 +55,7 @@ Add a debug configuration to your workspace `.zed/debug.json`:
     "type": "flutter",
     "request": "launch",
     "program": "lib/main.dart",
-    "device_id": "chrome",
-    "platform": "web"
+    "device_id": "chrome"
   },
   {
     "label": "Flutter (iOS Simulator)",
@@ -64,8 +63,7 @@ Add a debug configuration to your workspace `.zed/debug.json`:
     "type": "flutter",
     "request": "launch",
     "program": "lib/main.dart",
-    "device_id": "ios",
-    "platform": "ios"
+    "device_id": "ios"
   },
   {
     "label": "Flutter (Android)",

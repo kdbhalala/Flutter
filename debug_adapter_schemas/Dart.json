@@ -1,16 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Flutter Debug Adapter Configuration",
+  "title": "Flutter/Dart Debug Adapter Configuration",
   "type": "object",
   "properties": {
     "adapter": {
       "type": "string",
-      "enum": ["Flutter"]
+      "enum": ["Dart"]
     },
     "type": {
       "type": "string",
       "enum": ["dart", "flutter"],
-      "description": "Debug a Dart CLI app or a Flutter app"
+      "description": "Debug a Dart CLI app (dart) or a Flutter app (flutter)"
     },
     "label": {
       "type": "string",
@@ -18,7 +18,7 @@
     },
     "program": {
       "type": "string",
-      "description": "Path to the entry point (e.g. lib/main.dart)",
+      "description": "Path to the entry point",
       "examples": ["lib/main.dart", "bin/main.dart"]
     },
     "cwd": {
@@ -39,7 +39,7 @@
     "device_id": {
       "type": "string",
       "description": "Target device ID (from flutter devices)",
-      "examples": ["chrome", "edge", "macos", "ios", "android"]
+      "examples": ["chrome", "macos", "ios", "android"]
     },
     "useFvm": {
       "type": "boolean",
