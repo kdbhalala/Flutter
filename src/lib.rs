@@ -23,16 +23,20 @@ impl FlutterExtension {
         let binary_settings = LspSettings::for_worktree("dart", worktree)
             .ok()
             .and_then(|lsp_settings| lsp_settings.binary);
-        let binary_args = binary_settings
-            .as_ref()
-            .and_then(|s| s.arguments.clone());
+        let binary_args = binary_settings.as_ref().and_then(|s| s.arguments.clone());
 
         if let Some(path) = binary_settings.and_then(|s| s.path) {
-            return Ok(DartBinary { path, args: binary_args });
+            return Ok(DartBinary {
+                path,
+                args: binary_args,
+            });
         }
 
         if let Some(path) = worktree.which("dart") {
-            return Ok(DartBinary { path, args: binary_args });
+            return Ok(DartBinary {
+                path,
+                args: binary_args,
+            });
         }
 
         Err("dart must be installed from dart.dev/get-dart or pointed to by the LSP binary settings".to_string())
@@ -90,7 +94,12 @@ impl zed::Extension for FlutterExtension {
         let args = user_config
             .get("args")
             .and_then(|v| v.as_array())
-            .map(|arr| arr.iter().filter_map(|v| v.as_str()).map(String::from).collect::<Vec<_>>())
+            .map(|arr| {
+                arr.iter()
+                    .filter_map(|v| v.as_str())
+                    .map(String::from)
+                    .collect::<Vec<_>>()
+            })
             .unwrap_or_default();
 
         let use_fvm = user_config
@@ -106,25 +115,43 @@ impl zed::Extension for FlutterExtension {
 
         let (os, _) = current_platform();
         let tool = if debug_mode == "flutter" {
-            match os { Os::Windows => "flutter.bat", _ => "flutter" }
+            match os {
+                Os::Windows => "flutter.bat",
+                _ => "flutter",
+            }
         } else {
-            match os { Os::Windows => "dart.bat", _ => "dart" }
+            match os {
+                Os::Windows => "dart.bat",
+                _ => "dart",
+            }
         };
 
         let (command, arguments) = if use_fvm {
-            ("fvm".to_string(), vec![tool.to_string(), "debug_adapter".to_string()])
+            (
+                "fvm".to_string(),
+                vec![tool.to_string(), "debug_adapter".to_string()],
+            )
         } else {
             (tool.to_string(), vec!["debug_adapter".to_string()])
         };
 
-        let device_id = user_config.get("device_id").and_then(|v| v.as_str()).unwrap_or("chrome");
-        let platform = user_config.get("platform").and_then(|v| v.as_str()).unwrap_or("web");
+        let device_id = user_config
+            .get("device_id")
+            .and_then(|v| v.as_str())
+            .unwrap_or("chrome");
+        let platform = user_config
+            .get("platform")
+            .and_then(|v| v.as_str())
+            .unwrap_or("web");
         let cwd = user_config
             .get("cwd")
             .and_then(|v| v.as_str())
             .map(String::from)
             .or_else(|| Some(worktree.root_path()));
-        let request = user_config.get("request").and_then(|v| v.as_str()).unwrap_or("launch");
+        let request = user_config
+            .get("request")
+            .and_then(|v| v.as_str())
+            .unwrap_or("launch");
         let vm_service_uri = user_config.get("vmServiceUri").and_then(|v| v.as_str());
 
         let config_json = json!({
@@ -179,7 +206,10 @@ impl zed::Extension for FlutterExtension {
         match completion.kind? {
             CompletionKind::Class => Some(CodeLabel {
                 filter_range: (0..completion.label.len()).into(),
-                spans: vec![CodeLabelSpan::literal(completion.label, Some("type".into()))],
+                spans: vec![CodeLabelSpan::literal(
+                    completion.label,
+                    Some("type".into()),
+                )],
                 code: String::new(),
             }),
             CompletionKind::Function | CompletionKind::Constructor | CompletionKind::Method => {
@@ -190,7 +220,8 @@ impl zed::Extension for FlutterExtension {
                 let fn_name = " a";
                 let fat_arrow = " => ";
                 let call_expr = "();";
-                let code = format!("{return_type}{fn_name}{parameter_list}{fat_arrow}{name}{call_expr}");
+                let code =
+                    format!("{return_type}{fn_name}{parameter_list}{fat_arrow}{name}{call_expr}");
                 let parameter_list_start = return_type.len() + fn_name.len();
                 Some(CodeLabel {
                     spans: vec![
