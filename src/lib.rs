@@ -1,21 +1,41 @@
+use zed::lsp::CompletionKind;
+use zed::settings::LspSettings;
+use zed::{CodeLabel, CodeLabelSpan};
+use zed_extension_api::serde_json::json;
 use zed_extension_api::{
-    self as zed, DebugAdapterBinary, DebugTaskDefinition, LanguageServerId,
+    self as zed, current_platform, serde_json, DebugAdapterBinary, DebugTaskDefinition, Os, Result,
     StartDebuggingRequestArguments, StartDebuggingRequestArgumentsRequest, Worktree,
 };
+
+struct DartBinary {
+    pub path: String,
+    pub args: Option<Vec<String>>,
+}
 
 struct FlutterExtension;
 
 impl FlutterExtension {
-    fn dart_binary(&self, worktree: &Worktree) -> Result<String, String> {
-        worktree
-            .which("dart")
-            .ok_or_else(|| "dart not found in PATH. Install from flutter.dev".to_string())
-    }
+    fn language_server_binary(
+        &mut self,
+        _language_server_id: &zed::LanguageServerId,
+        worktree: &zed::Worktree,
+    ) -> Result<DartBinary> {
+        let binary_settings = LspSettings::for_worktree("dart", worktree)
+            .ok()
+            .and_then(|lsp_settings| lsp_settings.binary);
+        let binary_args = binary_settings
+            .as_ref()
+            .and_then(|s| s.arguments.clone());
 
-    fn flutter_binary(&self, worktree: &Worktree) -> Result<String, String> {
-        worktree
-            .which("flutter")
-            .ok_or_else(|| "flutter not found in PATH. Install from flutter.dev".to_string())
+        if let Some(path) = binary_settings.and_then(|s| s.path) {
+            return Ok(DartBinary { path, args: binary_args });
+        }
+
+        if let Some(path) = worktree.which("dart") {
+            return Ok(DartBinary { path, args: binary_args });
+        }
+
+        Err("dart must be installed from dart.dev/get-dart or pointed to by the LSP binary settings".to_string())
     }
 }
 
@@ -26,36 +46,30 @@ impl zed::Extension for FlutterExtension {
 
     fn language_server_command(
         &mut self,
-        _language_server_id: &LanguageServerId,
-        worktree: &Worktree,
-    ) -> Result<zed::Command, String> {
-        let dart = self.dart_binary(worktree)?;
+        language_server_id: &zed::LanguageServerId,
+        worktree: &zed::Worktree,
+    ) -> Result<zed::Command> {
+        let dart_binary = self.language_server_binary(language_server_id, worktree)?;
         Ok(zed::Command {
-            command: dart,
-            args: vec![
-                "language-server".to_string(),
-                "--protocol=lsp".to_string(),
-                "--client-id=zed".to_string(),
-                "--client-version=1".to_string(),
-            ],
+            command: dart_binary.path,
+            args: dart_binary.args.unwrap_or_else(|| {
+                vec!["language-server".to_string(), "--protocol=lsp".to_string()]
+            }),
             env: Default::default(),
         })
     }
 
     fn language_server_workspace_configuration(
         &mut self,
-        _language_server_id: &LanguageServerId,
-        _worktree: &Worktree,
-    ) -> Result<Option<zed::serde_json::Value>, String> {
-        Ok(Some(zed::serde_json::json!({
-            "dart": {
-                "lineLength": 80,
-                "enableSdkFormatter": true,
-                "completeFunctionCalls": true,
-                "showTodos": true,
-                "analysisExcludedFolders": [".dart_tool", ".pub-cache", "build"]
-            }
-        })))
+        _language_server_id: &zed::LanguageServerId,
+        worktree: &zed::Worktree,
+    ) -> Result<Option<serde_json::Value>> {
+        let settings = LspSettings::for_worktree("dart", worktree)
+            .ok()
+            .and_then(|lsp_settings| lsp_settings.settings.clone())
+            .unwrap_or_default();
+
+        Ok(Some(serde_json::json!({ "dart": settings })))
     }
 
     fn get_dap_binary(
@@ -65,49 +79,162 @@ impl zed::Extension for FlutterExtension {
         _user_provided_debug_adapter_path: Option<String>,
         worktree: &Worktree,
     ) -> Result<DebugAdapterBinary, String> {
-        let raw: zed::serde_json::Value =
-            zed::serde_json::from_str(&config.config).unwrap_or_default();
+        let user_config: serde_json::Value = serde_json::from_str(&config.config)
+            .map_err(|e| format!("Failed to parse debug config: {e}"))?;
 
-        let use_fvm = raw
+        let program = user_config
+            .get("program")
+            .and_then(|v| v.as_str())
+            .unwrap_or("lib/main.dart");
+
+        let args = user_config
+            .get("args")
+            .and_then(|v| v.as_array())
+            .map(|arr| arr.iter().filter_map(|v| v.as_str()).map(String::from).collect::<Vec<_>>())
+            .unwrap_or_default();
+
+        let use_fvm = user_config
             .get("useFvm")
             .and_then(|v| v.as_bool())
             .unwrap_or(false);
 
-        let (command, args) = if use_fvm {
-            let fvm = worktree
-                .which("fvm")
-                .ok_or_else(|| "fvm not found in PATH".to_string())?;
-            (
-                fvm,
-                vec![
-                    "flutter".to_string(),
-                    "debug-adapter".to_string(),
-                ],
-            )
+        let debug_mode = user_config
+            .get("type")
+            .and_then(|v| v.as_str())
+            .filter(|s| !s.trim().is_empty())
+            .ok_or_else(|| "type is required and cannot be empty or null".to_string())?;
+
+        let (os, _) = current_platform();
+        let tool = if debug_mode == "flutter" {
+            match os { Os::Windows => "flutter.bat", _ => "flutter" }
         } else {
-            let flutter = self.flutter_binary(worktree)?;
-            (flutter, vec!["debug-adapter".to_string()])
+            match os { Os::Windows => "dart.bat", _ => "dart" }
         };
 
-        let request = match raw.get("request").and_then(|v| v.as_str()) {
-            Some("attach") => StartDebuggingRequestArgumentsRequest::Attach,
-            _ => StartDebuggingRequestArgumentsRequest::Launch,
+        let (command, arguments) = if use_fvm {
+            ("fvm".to_string(), vec![tool.to_string(), "debug_adapter".to_string()])
+        } else {
+            (tool.to_string(), vec!["debug_adapter".to_string()])
         };
+
+        let device_id = user_config.get("device_id").and_then(|v| v.as_str()).unwrap_or("chrome");
+        let platform = user_config.get("platform").and_then(|v| v.as_str()).unwrap_or("web");
+        let cwd = user_config
+            .get("cwd")
+            .and_then(|v| v.as_str())
+            .map(String::from)
+            .or_else(|| Some(worktree.root_path()));
+        let request = user_config.get("request").and_then(|v| v.as_str()).unwrap_or("launch");
+        let vm_service_uri = user_config.get("vmServiceUri").and_then(|v| v.as_str());
+
+        let config_json = json!({
+            "type": tool,
+            "request": request,
+            "vmServiceUri": vm_service_uri,
+            "program": program,
+            "cwd": cwd.clone().unwrap_or_default(),
+            "args": args,
+            "flutterMode": "debug",
+            "deviceId": device_id,
+            "platform": platform,
+            "stopOnEntry": false
+        })
+        .to_string();
 
         Ok(DebugAdapterBinary {
             command: Some(command),
-            arguments: args,
-            envs: Default::default(),
-            cwd: raw
-                .get("cwd")
-                .and_then(|v| v.as_str())
-                .map(String::from),
+            arguments,
+            envs: vec![],
+            cwd,
             connection: None,
             request_args: StartDebuggingRequestArguments {
-                configuration: config.config,
-                request,
+                configuration: config_json,
+                request: match request {
+                    "attach" => StartDebuggingRequestArgumentsRequest::Attach,
+                    _ => StartDebuggingRequestArgumentsRequest::Launch,
+                },
             },
         })
+    }
+
+    fn dap_request_kind(
+        &mut self,
+        _adapter_name: String,
+        config: serde_json::Value,
+    ) -> Result<StartDebuggingRequestArgumentsRequest, String> {
+        match config.get("request") {
+            Some(v) if v == "launch" => Ok(StartDebuggingRequestArgumentsRequest::Launch),
+            Some(v) if v == "attach" => Ok(StartDebuggingRequestArgumentsRequest::Attach),
+            Some(value) => Err(format!("Unexpected value for `request`: {value:?}")),
+            None => Err("Missing required `request` field in debug config".into()),
+        }
+    }
+
+    fn label_for_completion(
+        &self,
+        _language_server_id: &zed::LanguageServerId,
+        completion: zed::lsp::Completion,
+    ) -> Option<CodeLabel> {
+        let arrow = " → ";
+        match completion.kind? {
+            CompletionKind::Class => Some(CodeLabel {
+                filter_range: (0..completion.label.len()).into(),
+                spans: vec![CodeLabelSpan::literal(completion.label, Some("type".into()))],
+                code: String::new(),
+            }),
+            CompletionKind::Function | CompletionKind::Constructor | CompletionKind::Method => {
+                let mut parts = completion.detail.as_ref()?.split(arrow);
+                let (name, _) = completion.label.split_once('(')?;
+                let parameter_list = parts.next()?;
+                let return_type = parts.next()?;
+                let fn_name = " a";
+                let fat_arrow = " => ";
+                let call_expr = "();";
+                let code = format!("{return_type}{fn_name}{parameter_list}{fat_arrow}{name}{call_expr}");
+                let parameter_list_start = return_type.len() + fn_name.len();
+                Some(CodeLabel {
+                    spans: vec![
+                        CodeLabelSpan::code_range(
+                            code.len() - call_expr.len() - name.len()..code.len() - call_expr.len(),
+                        ),
+                        CodeLabelSpan::code_range(
+                            parameter_list_start..parameter_list_start + parameter_list.len(),
+                        ),
+                        CodeLabelSpan::literal(arrow, None),
+                        CodeLabelSpan::code_range(0..return_type.len()),
+                    ],
+                    filter_range: (0..name.len()).into(),
+                    code,
+                })
+            }
+            CompletionKind::Property => {
+                let class_start = "class A {";
+                let get = " get ";
+                let property_end = " => a; }";
+                let ty = completion.detail?;
+                let name = completion.label;
+                let code = format!("{class_start}{ty}{get}{name}{property_end}");
+                let name_start = class_start.len() + ty.len() + get.len();
+                Some(CodeLabel {
+                    spans: vec![
+                        CodeLabelSpan::code_range(name_start..name_start + name.len()),
+                        CodeLabelSpan::literal(arrow, None),
+                        CodeLabelSpan::code_range(class_start.len()..class_start.len() + ty.len()),
+                    ],
+                    filter_range: (0..name.len()).into(),
+                    code,
+                })
+            }
+            CompletionKind::Variable => {
+                let name = completion.label;
+                Some(CodeLabel {
+                    filter_range: (0..name.len()).into(),
+                    spans: vec![CodeLabelSpan::literal(name, Some("variable".into()))],
+                    code: String::new(),
+                })
+            }
+            _ => None,
+        }
     }
 }
 
