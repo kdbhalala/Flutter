@@ -240,7 +240,7 @@ fn resolve_device_id(
     use_fvm: bool,
     search: &str,
 ) -> std::result::Result<Option<String>, String> {
-    let mut cmd = Command::new(&flutter_tool_path(worktree, tool, use_fvm));
+    let mut cmd = Command::new(flutter_tool_path(worktree, tool, use_fvm));
     if use_fvm {
         cmd = cmd.arg(tool);
     }
@@ -264,7 +264,7 @@ fn resolve_device_id(
         Err(_) => stdout
             .lines()
             .filter(|line| !line.trim().is_empty())
-            .map(|line| serde_json::from_str::<serde_json::Value>(line))
+            .map(serde_json::from_str::<serde_json::Value>)
             .collect::<std::result::Result<_, _>>()
             .map_err(|e| format!("flutter devices output is not valid JSON: {e}"))?,
     };
@@ -426,8 +426,7 @@ impl zed::Extension for FlutterExtension {
             .and_then(|s| {
                 s.as_object()
                     .and_then(|o| o.get("dart"))
-                    .and_then(|d| d.as_object())
-                    .map(|o| o.clone())
+                    .and_then(|d| d.as_object()).cloned()
             });
 
         let get_bool = |key: &str, default: bool| -> bool {
@@ -904,7 +903,7 @@ impl zed::Extension for FlutterExtension {
         };
 
         if output.status.unwrap_or(-1) != 0 {
-            return Err(format!("{text}"));
+            return Err(text.to_string());
         }
 
         Ok(SlashCommandOutput {
