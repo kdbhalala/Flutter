@@ -5,8 +5,12 @@ Cargo.lock
 # Zed extension build output
 *.wasm
 
+#caveman
+.agents/
+
 # code-review-graph
 .code-review-graph/
+.mcp.json
 
 # macOS
 .DS_Store

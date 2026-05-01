@@ -5,11 +5,16 @@
   "properties": {
     "adapter": {
       "type": "string",
-      "enum": ["Dart"]
+      "enum": [
+        "Dart"
+      ]
     },
     "type": {
       "type": "string",
-      "enum": ["dart", "flutter"],
+      "enum": [
+        "dart",
+        "flutter"
+      ],
       "description": "Debug a Dart CLI app (dart) or a Flutter app (flutter)"
     },
     "label": {
@@ -19,7 +24,10 @@
     "program": {
       "type": "string",
       "description": "Path to the entry point",
-      "examples": ["lib/main.dart", "bin/main.dart"]
+      "examples": [
+        "lib/main.dart",
+        "bin/main.dart"
+      ]
     },
     "cwd": {
       "type": "string",
@@ -27,19 +35,41 @@
     },
     "request": {
       "type": "string",
-      "enum": ["launch", "attach"],
+      "enum": [
+        "launch",
+        "attach"
+      ],
       "default": "launch"
     },
     "args": {
       "type": "array",
       "description": "Additional arguments passed to flutter/dart run",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "device_id": {
       "type": "string",
-      "description": "Target device ID (from flutter devices)",
-      "examples": ["chrome", "macos", "ios", "android"]
+      "description": "Target device ID. Use a platform name (\"ios\", \"android\", \"macos\", \"chrome\") or a specific device ID from `flutter devices`. If omitted, Flutter's debug adapter picks the device automatically.",
+      "examples": [
+        "ios",
+        "android",
+        "macos",
+        "chrome"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "description": "Target platform override passed to the debug adapter. Usually inferred automatically; only set if you need to force a specific value.",
+      "examples": [
+        "ios",
+        "android",
+        "web",
+        "macos",
+        "windows",
+        "linux"
+      ]
     },
     "useFvm": {
       "type": "boolean",
@@ -56,10 +86,17 @@
     },
     "flutterMode": {
       "type": "string",
-      "enum": ["debug", "profile", "release"],
+      "enum": [
+        "debug",
+        "profile",
+        "release"
+      ],
       "default": "debug"
     }
   },
-  "required": ["program", "adapter"],
+  "required": [
+    "program",
+    "adapter"
+  ],
   "additionalProperties": false
 }

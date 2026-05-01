@@ -15,4 +15,22 @@ languages = ["Dart"]
 repository = "https://github.com/UserNobody14/tree-sitter-dart"
 commit = "80e23c07b64494f7e21090bb3450223ef0b192f4"
 
+[[slash_commands]]
+name = "flutter"
+description = "Run Flutter CLI commands"
+tooltip_text = "Run Flutter command"
+requires_argument = true
+
+[[slash_commands]]
+name = "fvm"
+description = "Run FVM-managed Flutter CLI commands"
+tooltip_text = "Run FVM Flutter command"
+requires_argument = true
+
+[[slash_commands]]
+name = "dart"
+description = "Run Dart CLI commands (analyze, test, format, pub, etc.)"
+tooltip_text = "Run Dart command"
+requires_argument = true
+
 [debug_adapters.Dart]

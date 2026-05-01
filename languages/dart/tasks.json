@@ -2,115 +2,439 @@
   {
     "label": "flutter: run",
     "command": "flutter",
-    "args": ["run"],
-    "tags": ["flutter-run"]
+    "args": [
+      "run"
+    ],
+    "tags": [
+      "flutter-run"
+    ]
   },
   {
     "label": "flutter: run (release)",
     "command": "flutter",
-    "args": ["run", "--release"],
-    "tags": ["flutter-run-release"]
+    "args": [
+      "run",
+      "--release"
+    ],
+    "tags": [
+      "flutter-run-release"
+    ]
   },
   {
     "label": "flutter: pub get",
     "command": "flutter",
-    "args": ["pub", "get"],
-    "tags": ["flutter-pub-get"]
+    "args": [
+      "pub",
+      "get"
+    ],
+    "tags": [
+      "flutter-pub-get"
+    ]
   },
   {
     "label": "flutter: pub upgrade",
     "command": "flutter",
-    "args": ["pub", "upgrade"],
-    "tags": ["flutter-pub-upgrade"]
+    "args": [
+      "pub",
+      "upgrade"
+    ],
+    "tags": [
+      "flutter-pub-upgrade"
+    ]
   },
   {
     "label": "flutter: build apk",
     "command": "flutter",
-    "args": ["build", "apk"],
-    "tags": ["flutter-build-apk"]
+    "args": [
+      "build",
+      "apk"
+    ],
+    "tags": [
+      "flutter-build-apk"
+    ]
   },
   {
     "label": "flutter: build ios",
     "command": "flutter",
-    "args": ["build", "ios"],
-    "tags": ["flutter-build-ios"]
+    "args": [
+      "build",
+      "ios"
+    ],
+    "tags": [
+      "flutter-build-ios"
+    ]
   },
   {
     "label": "flutter: build web",
     "command": "flutter",
-    "args": ["build", "web"],
-    "tags": ["flutter-build-web"]
+    "args": [
+      "build",
+      "web"
+    ],
+    "tags": [
+      "flutter-build-web"
+    ]
   },
   {
     "label": "flutter: test",
     "command": "flutter",
-    "args": ["test"],
-    "tags": ["flutter-test"]
+    "args": [
+      "test"
+    ],
+    "tags": [
+      "flutter-test"
+    ]
   },
   {
     "label": "flutter: test $ZED_STEM",
     "command": "flutter",
-    "args": ["test", "$ZED_FILE"],
-    "tags": ["flutter-test-file"]
+    "args": [
+      "test",
+      "$ZED_FILE"
+    ],
+    "tags": [
+      "flutter-test-file"
+    ]
   },
   {
     "label": "flutter: clean",
     "command": "flutter",
-    "args": ["clean"],
-    "tags": ["flutter-clean"]
+    "args": [
+      "clean"
+    ],
+    "tags": [
+      "flutter-clean"
+    ]
   },
   {
     "label": "flutter: devices",
     "command": "flutter",
-    "args": ["devices"],
-    "tags": ["flutter-devices"]
+    "args": [
+      "devices"
+    ],
+    "tags": [
+      "flutter-devices"
+    ]
   },
   {
     "label": "flutter: doctor",
     "command": "flutter",
-    "args": ["doctor"],
-    "tags": ["flutter-doctor"]
+    "args": [
+      "doctor"
+    ],
+    "tags": [
+      "flutter-doctor"
+    ]
+  },
+  {
+    "label": "flutter: emulators",
+    "command": "flutter",
+    "args": [
+      "emulators"
+    ],
+    "tags": [
+      "flutter-emulators"
+    ]
+  },
+  {
+    "label": "flutter: pub outdated",
+    "command": "flutter",
+    "args": [
+      "pub",
+      "outdated"
+    ],
+    "tags": [
+      "flutter-pub-outdated"
+    ]
   },
   {
     "label": "dart: run $ZED_FILE",
     "command": "dart",
-    "args": ["run", "$ZED_FILE"],
-    "tags": ["dart-run-file"]
+    "args": [
+      "run",
+      "$ZED_FILE"
+    ],
+    "tags": [
+      "dart-run-file"
+    ]
   },
   {
     "label": "dart: test $ZED_STEM",
     "command": "dart",
-    "args": ["test", "$ZED_FILE"],
-    "tags": ["dart-test-file"]
+    "args": [
+      "test",
+      "$ZED_FILE"
+    ],
+    "tags": [
+      "dart-test-file"
+    ]
   },
   {
     "label": "dart: format",
     "command": "dart",
-    "args": ["format", "."],
-    "tags": ["dart-format"]
+    "args": [
+      "format",
+      "."
+    ],
+    "tags": [
+      "dart-format"
+    ]
   },
   {
     "label": "dart: analyze",
     "command": "dart",
-    "args": ["analyze"],
-    "tags": ["dart-analyze"]
+    "args": [
+      "analyze"
+    ],
+    "tags": [
+      "dart-analyze"
+    ]
   },
   {
     "label": "fvm: flutter run",
     "command": "fvm",
-    "args": ["flutter", "run"],
-    "tags": ["fvm-flutter-run"]
+    "args": [
+      "flutter",
+      "run"
+    ],
+    "tags": [
+      "fvm-flutter-run"
+    ]
   },
   {
     "label": "fvm: flutter pub get",
     "command": "fvm",
-    "args": ["flutter", "pub", "get"],
-    "tags": ["fvm-flutter-pub-get"]
+    "args": [
+      "flutter",
+      "pub",
+      "get"
+    ],
+    "tags": [
+      "fvm-flutter-pub-get"
+    ]
+  },
+  {
+    "label": "fvm: flutter pub upgrade",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "pub",
+      "upgrade"
+    ],
+    "tags": [
+      "fvm-flutter-pub-upgrade"
+    ]
+  },
+  {
+    "label": "fvm: flutter emulators",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "emulators"
+    ],
+    "tags": [
+      "fvm-flutter-emulators"
+    ]
+  },
+  {
+    "label": "fvm: flutter devices",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "devices"
+    ],
+    "tags": [
+      "fvm-flutter-devices"
+    ]
+  },
+  {
+    "label": "fvm: flutter doctor",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "doctor"
+    ],
+    "tags": [
+      "fvm-flutter-doctor"
+    ]
   },
   {
     "label": "fvm: flutter test",
     "command": "fvm",
-    "args": ["flutter", "test"],
-    "tags": ["fvm-flutter-test"]
+    "args": [
+      "flutter",
+      "test"
+    ],
+    "tags": [
+      "fvm-flutter-test"
+    ]
+  },
+  {
+    "label": "flutter: build apk --release",
+    "command": "flutter",
+    "args": [
+      "build",
+      "apk",
+      "--release"
+    ],
+    "tags": [
+      "flutter-build-apk-release"
+    ]
+  },
+  {
+    "label": "flutter: build appbundle",
+    "command": "flutter",
+    "args": [
+      "build",
+      "appbundle"
+    ],
+    "tags": [
+      "flutter-build-appbundle"
+    ]
+  },
+  {
+    "label": "flutter: build ios --release",
+    "command": "flutter",
+    "args": [
+      "build",
+      "ios",
+      "--release"
+    ],
+    "tags": [
+      "flutter-build-ios-release"
+    ]
+  },
+  {
+    "label": "flutter: build ipa",
+    "command": "flutter",
+    "args": [
+      "build",
+      "ipa"
+    ],
+    "tags": [
+      "flutter-build-ipa"
+    ]
+  },
+  {
+    "label": "flutter: gen-l10n",
+    "command": "flutter",
+    "args": [
+      "gen-l10n"
+    ],
+    "tags": [
+      "flutter-gen-l10n"
+    ]
+  },
+  {
+    "label": "flutter: attach",
+    "command": "flutter",
+    "args": [
+      "attach"
+    ],
+    "tags": [
+      "flutter-attach"
+    ]
+  },
+  {
+    "label": "flutter: screenshot",
+    "command": "flutter",
+    "args": [
+      "screenshot"
+    ],
+    "tags": [
+      "flutter-screenshot"
+    ]
+  },
+  {
+    "label": "dart: pub get",
+    "command": "dart",
+    "args": [
+      "pub",
+      "get"
+    ],
+    "tags": [
+      "dart-pub-get"
+    ]
+  },
+  {
+    "label": "dart: pub upgrade",
+    "command": "dart",
+    "args": [
+      "pub",
+      "upgrade"
+    ],
+    "tags": [
+      "dart-pub-upgrade"
+    ]
+  },
+  {
+    "label": "dart: pub outdated",
+    "command": "dart",
+    "args": [
+      "pub",
+      "outdated"
+    ],
+    "tags": [
+      "dart-pub-outdated"
+    ]
+  },
+  {
+    "label": "fvm: flutter build apk",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "build",
+      "apk"
+    ],
+    "tags": [
+      "fvm-flutter-build-apk"
+    ]
+  },
+  {
+    "label": "fvm: flutter build ios",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "build",
+      "ios"
+    ],
+    "tags": [
+      "fvm-flutter-build-ios"
+    ]
+  },
+  {
+    "label": "fvm: flutter build web",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "build",
+      "web"
+    ],
+    "tags": [
+      "fvm-flutter-build-web"
+    ]
+  },
+  {
+    "label": "fvm: flutter build appbundle",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "build",
+      "appbundle"
+    ],
+    "tags": [
+      "fvm-flutter-build-appbundle"
+    ]
+  },
+  {
+    "label": "fvm: flutter clean",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "clean"
+    ],
+    "tags": [
+      "fvm-flutter-clean"
+    ]
   }
 ]
