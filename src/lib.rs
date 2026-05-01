@@ -426,7 +426,8 @@ impl zed::Extension for FlutterExtension {
             .and_then(|s| {
                 s.as_object()
                     .and_then(|o| o.get("dart"))
-                    .and_then(|d| d.as_object()).cloned()
+                    .and_then(|d| d.as_object())
+                    .cloned()
             });
 
         let get_bool = |key: &str, default: bool| -> bool {
