@@ -398,3 +398,33 @@
   "continue"
   "for"
 ] @keyword.repeat
+
+; ===== Dart 3: Patterns & Switch Expressions =====
+
+; switch expression arrow (=>) — same as fat arrow operator
+(switch_expression_case
+  "=>" @operator)
+
+; guard clause in patterns
+(guard
+  "when" @keyword.conditional)
+
+; record literals: (x: 1, y: 2)
+(record_literal) @none
+
+; record type annotations: (int, String) or (x: int)
+(record_type) @type
+(record_type_named_field
+  name: (identifier) @variable.parameter)
+
+; pattern variable bindings
+(variable_pattern
+  (identifier) @variable)
+
+; wildcard pattern _
+(wildcard_pattern
+  "_" @variable.special)
+
+; rest pattern ...
+(rest_pattern
+  "..." @operator)

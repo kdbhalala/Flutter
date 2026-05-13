@@ -436,5 +436,181 @@
     "tags": [
       "fvm-flutter-clean"
     ]
+  },
+  {
+    "label": "dart: build_runner build",
+    "command": "dart",
+    "args": [
+      "run",
+      "build_runner",
+      "build",
+      "--delete-conflicting-outputs"
+    ],
+    "tags": [
+      "dart-build-runner-build"
+    ]
+  },
+  {
+    "label": "dart: build_runner watch",
+    "command": "dart",
+    "args": [
+      "run",
+      "build_runner",
+      "watch",
+      "--delete-conflicting-outputs"
+    ],
+    "tags": [
+      "dart-build-runner-watch"
+    ]
+  },
+  {
+    "label": "dart: fix",
+    "command": "dart",
+    "args": [
+      "fix",
+      "--apply"
+    ],
+    "tags": [
+      "dart-fix"
+    ]
+  },
+  {
+    "label": "dart: compile exe",
+    "command": "dart",
+    "args": [
+      "compile",
+      "exe",
+      "$ZED_FILE"
+    ],
+    "tags": [
+      "dart-compile-exe"
+    ]
+  },
+  {
+    "label": "flutter: run -d chrome",
+    "command": "flutter",
+    "args": [
+      "run",
+      "-d",
+      "chrome"
+    ],
+    "tags": [
+      "flutter-run-chrome"
+    ]
+  },
+  {
+    "label": "flutter: run --web-renderer canvaskit",
+    "command": "flutter",
+    "args": [
+      "run",
+      "--web-renderer",
+      "canvaskit"
+    ],
+    "tags": [
+      "flutter-run-canvaskit"
+    ]
+  },
+  {
+    "label": "flutter: upgrade",
+    "command": "flutter",
+    "args": [
+      "upgrade"
+    ],
+    "tags": [
+      "flutter-upgrade"
+    ]
+  },
+  {
+    "label": "flutter: pub run build_runner build",
+    "command": "flutter",
+    "args": [
+      "pub",
+      "run",
+      "build_runner",
+      "build",
+      "--delete-conflicting-outputs"
+    ],
+    "tags": [
+      "flutter-build-runner-build"
+    ]
+  },
+  {
+    "label": "flutter: pub run build_runner watch",
+    "command": "flutter",
+    "args": [
+      "pub",
+      "run",
+      "build_runner",
+      "watch",
+      "--delete-conflicting-outputs"
+    ],
+    "tags": [
+      "flutter-build-runner-watch"
+    ]
+  },
+  {
+    "label": "fvm: flutter run -d chrome",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "run",
+      "-d",
+      "chrome"
+    ],
+    "tags": [
+      "fvm-flutter-run-chrome"
+    ]
+  },
+  {
+    "label": "fvm: flutter pub run build_runner build",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "pub",
+      "run",
+      "build_runner",
+      "build",
+      "--delete-conflicting-outputs"
+    ],
+    "tags": [
+      "fvm-flutter-build-runner-build"
+    ]
+  },
+  {
+    "label": "fvm: flutter pub run build_runner watch",
+    "command": "fvm",
+    "args": [
+      "flutter",
+      "pub",
+      "run",
+      "build_runner",
+      "watch",
+      "--delete-conflicting-outputs"
+    ],
+    "tags": [
+      "fvm-flutter-build-runner-watch"
+    ]
+  },
+  {
+    "label": "dart: test --coverage",
+    "command": "dart",
+    "args": [
+      "test",
+      "--coverage=coverage"
+    ],
+    "tags": [
+      "dart-test-coverage"
+    ]
+  },
+  {
+    "label": "flutter: test --coverage",
+    "command": "flutter",
+    "args": [
+      "test",
+      "--coverage"
+    ],
+    "tags": [
+      "flutter-test-coverage"
+    ]
   }
 ]

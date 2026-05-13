@@ -9,15 +9,18 @@ Flutter and Dart support for the [Zed](https://zed.dev) editor — LSP, syntax h
 | Feature | Details |
 |---------|---------|
 | **Dart LSP** | Autocomplete, diagnostics, go-to-definition, hover, rename, find references, code actions via Dart Analysis Server |
-| **Syntax highlighting** | Full Tree-sitter Dart grammar |
-| **Auto-indent** | Bracket/brace-aware indentation rules |
-| **Code outline** | Classes, functions, getters, setters, enums, extensions |
-| **Debugging** | Flutter and Dart debug adapter (DAP) — launch and attach |
-| **Tasks** | 30+ built-in tasks for Flutter, Dart, and FVM workflows |
+| **Syntax highlighting** | Full Tree-sitter Dart grammar including Dart 3 patterns, records, sealed classes |
+| **Auto-indent** | Bracket/brace/block-aware indentation for classes, functions, if/for/while, try/catch, literals |
+| **Code outline** | Classes, mixins, enums, extensions, functions, getters, setters, constructors, operator overloads |
+| **Snippets** | 120+ snippets — Dart, Flutter widgets, lifecycle, BLoC, Riverpod, Provider, Freezed, go_router, json_serializable |
+| **Debug locator** | Auto-converts `flutter run` / `dart run` tasks to debug sessions — no manual `.zed/debug.json` needed |
+| **Debugging** | Flutter and Dart debug adapter (DAP) — launch and attach, FVM-aware |
+| **Tasks** | 50+ built-in tasks for Flutter, Dart, and FVM workflows including build_runner, coverage, web |
+| **Runnables** | `main()`, `test()`, `testWidgets()`, `blocTest()`, `group()` detected as runnable |
 | **Slash commands** | `/flutter`, `/dart`, `/fvm` in the Zed assistant |
-| **FVM support** | Tasks and DAP respect `useFvm` for Flutter Version Management |
+| **FVM support** | Tasks, DAP, and debug locator all respect FVM for Flutter Version Management |
 | **SDK auto-detection** | Finds SDK via LSP settings → PATH → `FLUTTER_ROOT` → FVM default → asdf → mise |
-| **Rich completions** | Typed labels for Class, Function, Constructor, Method, Property, Variable |
+| **Rich completions** | Typed labels for Class, Function, Constructor, Method, Property, Variable, Enum, Field, Module |
 
 ---
 
@@ -204,9 +207,13 @@ Run via `cmd+shift+p` → **"task: spawn"**.
 |------|---------|
 | flutter: run | `flutter run` |
 | flutter: run (release) | `flutter run --release` |
+| flutter: run -d chrome | `flutter run -d chrome` |
+| flutter: run --web-renderer canvaskit | `flutter run --web-renderer canvaskit` |
 | flutter: test | `flutter test` |
 | flutter: test $ZED_STEM | `flutter test <current file>` |
+| flutter: test --coverage | `flutter test --coverage` |
 | flutter: clean | `flutter clean` |
+| flutter: upgrade | `flutter upgrade` |
 | flutter: devices | `flutter devices` |
 | flutter: doctor | `flutter doctor` |
 | flutter: emulators | `flutter emulators` |
@@ -216,6 +223,8 @@ Run via `cmd+shift+p` → **"task: spawn"**.
 | flutter: pub get | `flutter pub get` |
 | flutter: pub upgrade | `flutter pub upgrade` |
 | flutter: pub outdated | `flutter pub outdated` |
+| flutter: pub run build_runner build | `flutter pub run build_runner build --delete-conflicting-outputs` |
+| flutter: pub run build_runner watch | `flutter pub run build_runner watch --delete-conflicting-outputs` |
 | flutter: build apk | `flutter build apk` |
 | flutter: build apk --release | `flutter build apk --release` |
 | flutter: build appbundle | `flutter build appbundle` |
@@ -230,17 +239,23 @@ Run via `cmd+shift+p` → **"task: spawn"**.
 |------|---------|
 | dart: run $ZED_FILE | `dart run <current file>` |
 | dart: test $ZED_STEM | `dart test <current file>` |
+| dart: test --coverage | `dart test --coverage=coverage` |
 | dart: format | `dart format .` |
 | dart: analyze | `dart analyze` |
+| dart: fix | `dart fix --apply` |
+| dart: compile exe | `dart compile exe <current file>` |
 | dart: pub get | `dart pub get` |
 | dart: pub upgrade | `dart pub upgrade` |
 | dart: pub outdated | `dart pub outdated` |
+| dart: build_runner build | `dart run build_runner build --delete-conflicting-outputs` |
+| dart: build_runner watch | `dart run build_runner watch --delete-conflicting-outputs` |
 
 ### FVM
 
 | Task | Command |
 |------|---------|
 | fvm: flutter run | `fvm flutter run` |
+| fvm: flutter run -d chrome | `fvm flutter run -d chrome` |
 | fvm: flutter test | `fvm flutter test` |
 | fvm: flutter pub get | `fvm flutter pub get` |
 | fvm: flutter pub upgrade | `fvm flutter pub upgrade` |
@@ -252,10 +267,104 @@ Run via `cmd+shift+p` → **"task: spawn"**.
 | fvm: flutter build web | `fvm flutter build web` |
 | fvm: flutter build appbundle | `fvm flutter build appbundle` |
 | fvm: flutter clean | `fvm flutter clean` |
+| fvm: flutter pub run build_runner build | `fvm flutter pub run build_runner build --delete-conflicting-outputs` |
+| fvm: flutter pub run build_runner watch | `fvm flutter pub run build_runner watch --delete-conflicting-outputs` |
+
+## Snippets
+
+120+ snippets triggered by prefix in any `.dart` file.
+
+### Flutter Widgets
+
+| Prefix | Inserts |
+|--------|---------|
+| `stless` | StatelessWidget |
+| `stful` | StatefulWidget |
+| `stfulinit` | StatefulWidget + initState |
+| `stcons` | ConsumerWidget (Riverpod) |
+| `stconsful` | ConsumerStatefulWidget (Riverpod) |
+| `scaffold` | Scaffold |
+| `matapp` | MaterialApp entry point |
+| `cupeapp` | CupertinoApp entry point |
+| `listviewb` | ListView.builder |
+| `gridviewb` | GridView.builder |
+| `gvc` | GridView.count |
+| `streambuilder` | StreamBuilder |
+| `futurebuilder` | FutureBuilder |
+| `animbuilder` | AnimatedBuilder |
+| `stfulB` | StatefulBuilder |
+| `layoutB` | LayoutBuilder |
+
+### Lifecycle & Overrides
+
+| Prefix | Inserts |
+|--------|---------|
+| `build` | `build()` override |
+| `initstate` | `initState()` override |
+| `dispose` | `dispose()` override |
+| `didchange` | `didChangeDependencies()` override |
+| `didupdate` | `didUpdateWidget()` override |
+| `reassemble` | `reassemble()` override |
+
+### State Management
+
+| Prefix | Inserts |
+|--------|---------|
+| `blocEvent` | BLoC sealed event class |
+| `blocState` | BLoC sealed state class |
+| `blocClass` | BLoC class with handler |
+| `blocBuilder` | BlocBuilder widget |
+| `blocProvider` | BlocProvider widget |
+| `changeNotifier` | ChangeNotifier class |
+| `cnProvider` | ChangeNotifierProvider |
+| `consumer` | Provider Consumer widget |
+| `stateProvider` | Riverpod StateProvider |
+| `futureProvider` | Riverpod FutureProvider |
+| `streamProvider` | Riverpod StreamProvider |
+| `notifierProvider` | Riverpod NotifierProvider |
+| `asyncNotifierProvider` | Riverpod AsyncNotifierProvider |
+
+### Data Classes
+
+| Prefix | Inserts |
+|--------|---------|
+| `freezed` | Freezed immutable data class with fromJson/toJson |
+| `freezedUnion` | Freezed sealed union type |
+| `jsonser` | json_serializable annotated class |
+| `equatable` | Equatable value equality class |
+
+### Navigation (go_router)
+
+| Prefix | Inserts |
+|--------|---------|
+| `goRouter` | GoRouter configuration |
+| `goRoute` | Single GoRoute entry |
+| `ctxGo` | `context.go('/')` |
+| `ctxPush` | `context.push('/')` |
+
+### Navigation (Navigator)
+
+| Prefix | Inserts |
+|--------|---------|
+| `navpush` | `Navigator.push(...)` |
+| `navnamed` | `Navigator.pushNamed(...)` |
+
+### Utilities
+
+| Prefix | Inserts |
+|--------|---------|
+| `importM` | `import 'package:flutter/material.dart'` |
+| `importC` | `import 'package:flutter/cupertino.dart'` |
+| `edgeall` | `EdgeInsets.all(...)` |
+| `edgesym` | `EdgeInsets.symmetric(...)` |
+| `snackbar` | `ScaffoldMessenger.of(context).showSnackBar(...)` |
+| `dialog` | `showDialog(...)` |
+| `theme` | `Theme.of(context)` |
+| `mediaquery` | `MediaQuery.of(context)` |
 
 ---
 
-## Slash Commands
+
 
 Use in the Zed AI assistant panel.
 
@@ -289,7 +398,7 @@ These VS Code Dart-Code features have no equivalent Zed extension API surface ye
 | Coverage gutters | No gutter decoration API |
 | Widget inspector | Requires custom UI panel |
 | Profile / memory views | Requires custom UI panel |
-| Snippet completions | Not exposed to extensions |
+| Snippet completions | ✅ Available — 120+ snippets in `snippets/dart.json` |
 | Wrap with Widget / extract method | No custom code action provider API |
 
 ---

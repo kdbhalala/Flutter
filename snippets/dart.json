@@ -1058,5 +1058,335 @@
     "body": [
       "EdgeInsets.symmetric(horizontal: ${1:16.0}, vertical: ${2:8.0})$0"
     ]
+  },
+  "Freezed Data Class": {
+    "prefix": "freezed",
+    "description": "Freezed immutable data class with fromJson/toJson",
+    "body": [
+      "import 'package:freezed_annotation/freezed_annotation.dart';",
+      "",
+      "part '${TM_FILENAME_BASE}.freezed.dart';",
+      "part '${TM_FILENAME_BASE}.g.dart';",
+      "",
+      "@freezed",
+      "class ${1:MyModel} with _$${1:MyModel} {",
+      "  const factory ${1:MyModel}({",
+      "    required ${2:String} ${3:id},",
+      "    $0",
+      "  }) = _${1:MyModel};",
+      "",
+      "  factory ${1:MyModel}.fromJson(Map<String, dynamic> json) =>",
+      "      _$${1:MyModel}FromJson(json);",
+      "}"
+    ]
+  },
+  "Freezed Union": {
+    "prefix": "freezedUnion",
+    "description": "Freezed sealed union/sum type",
+    "body": [
+      "import 'package:freezed_annotation/freezed_annotation.dart';",
+      "",
+      "part '${TM_FILENAME_BASE}.freezed.dart';",
+      "",
+      "@freezed",
+      "sealed class ${1:MyState} with _$${1:MyState} {",
+      "  const factory ${1:MyState}.initial() = _Initial;",
+      "  const factory ${1:MyState}.loading() = _Loading;",
+      "  const factory ${1:MyState}.success(${2:String} ${3:data}) = _Success;",
+      "  const factory ${1:MyState}.failure(String message) = _Failure;",
+      "}"
+    ]
+  },
+  "json_serializable Class": {
+    "prefix": "jsonser",
+    "description": "json_serializable annotated Dart class",
+    "body": [
+      "import 'package:json_annotation/json_annotation.dart';",
+      "",
+      "part '${TM_FILENAME_BASE}.g.dart';",
+      "",
+      "@JsonSerializable()",
+      "class ${1:MyModel} {",
+      "  const ${1:MyModel}({",
+      "    required this.${2:id},",
+      "    $0",
+      "  });",
+      "",
+      "  final ${3:String} ${2:id};",
+      "",
+      "  factory ${1:MyModel}.fromJson(Map<String, dynamic> json) =>",
+      "      _$${1:MyModel}FromJson(json);",
+      "",
+      "  Map<String, dynamic> toJson() => _$${1:MyModel}ToJson(this);",
+      "}"
+    ]
+  },
+  "Equatable Class": {
+    "prefix": "equatable",
+    "description": "Equatable value equality class",
+    "body": [
+      "import 'package:equatable/equatable.dart';",
+      "",
+      "class ${1:MyClass} extends Equatable {",
+      "  const ${1:MyClass}({",
+      "    required this.${2:id},",
+      "    $0",
+      "  });",
+      "",
+      "  final ${3:String} ${2:id};",
+      "",
+      "  @override",
+      "  List<Object?> get props => [${2:id}];",
+      "}"
+    ]
+  },
+  "BLoC Event": {
+    "prefix": "blocEvent",
+    "description": "BLoC event sealed class",
+    "body": [
+      "import 'package:equatable/equatable.dart';",
+      "",
+      "sealed class ${1:My}Event extends Equatable {",
+      "  const ${1:My}Event();",
+      "",
+      "  @override",
+      "  List<Object?> get props => [];",
+      "}",
+      "",
+      "final class ${1:My}Started extends ${1:My}Event {",
+      "  const ${1:My}Started();",
+      "}"
+    ]
+  },
+  "BLoC State": {
+    "prefix": "blocState",
+    "description": "BLoC state sealed class",
+    "body": [
+      "import 'package:equatable/equatable.dart';",
+      "",
+      "sealed class ${1:My}State extends Equatable {",
+      "  const ${1:My}State();",
+      "",
+      "  @override",
+      "  List<Object?> get props => [];",
+      "}",
+      "",
+      "final class ${1:My}Initial extends ${1:My}State {",
+      "  const ${1:My}Initial();",
+      "}",
+      "",
+      "final class ${1:My}Loading extends ${1:My}State {",
+      "  const ${1:My}Loading();",
+      "}",
+      "",
+      "final class ${1:My}Success extends ${1:My}State {",
+      "  const ${1:My}Success(this.${2:data});",
+      "  final ${3:String} ${2:data};",
+      "",
+      "  @override",
+      "  List<Object?> get props => [${2:data}];",
+      "}",
+      "",
+      "final class ${1:My}Failure extends ${1:My}State {",
+      "  const ${1:My}Failure(this.message);",
+      "  final String message;",
+      "",
+      "  @override",
+      "  List<Object?> get props => [message];",
+      "}"
+    ]
+  },
+  "BLoC Class": {
+    "prefix": "blocClass",
+    "description": "BLoC class with event handler registration",
+    "body": [
+      "import 'package:flutter_bloc/flutter_bloc.dart';",
+      "",
+      "class ${1:My}Bloc extends Bloc<${1:My}Event, ${1:My}State> {",
+      "  ${1:My}Bloc() : super(const ${1:My}Initial()) {",
+      "    on<${1:My}Started>(_on${1:My}Started);",
+      "  }",
+      "",
+      "  Future<void> _on${1:My}Started(",
+      "    ${1:My}Started event,",
+      "    Emitter<${1:My}State> emit,",
+      "  ) async {",
+      "    emit(const ${1:My}Loading());",
+      "    try {",
+      "      $0",
+      "      emit(${1:My}Success(result));",
+      "    } catch (e) {",
+      "      emit(${1:My}Failure(e.toString()));",
+      "    }",
+      "  }",
+      "}"
+    ]
+  },
+  "BlocBuilder": {
+    "prefix": "blocBuilder",
+    "description": "BlocBuilder widget",
+    "body": [
+      "BlocBuilder<${1:My}Bloc, ${1:My}State>(",
+      "  builder: (context, state) {",
+      "    return switch (state) {",
+      "      ${1:My}Initial() => $2,",
+      "      ${1:My}Loading() => const CircularProgressIndicator(),",
+      "      ${1:My}Success(:final ${3:data}) => Text(${3:data}.toString()),",
+      "      ${1:My}Failure(:final message) => Text(message),",
+      "    };",
+      "  },",
+      "),"
+    ]
+  },
+  "BlocProvider": {
+    "prefix": "blocProvider",
+    "description": "BlocProvider widget",
+    "body": [
+      "BlocProvider(",
+      "  create: (context) => ${1:My}Bloc(),",
+      "  child: ${2:child},",
+      "),"
+    ]
+  },
+  "ChangeNotifier Class": {
+    "prefix": "changeNotifier",
+    "description": "ChangeNotifier provider class",
+    "body": [
+      "import 'package:flutter/foundation.dart';",
+      "",
+      "class ${1:My}Provider extends ChangeNotifier {",
+      "  ${2:String} _${3:value} = ${4:''};",
+      "",
+      "  ${2:String} get ${3:value} => _${3:value};",
+      "",
+      "  set ${3:value}(${2:String} newValue) {",
+      "    _${3:value} = newValue;",
+      "    notifyListeners();",
+      "  }",
+      "  $0",
+      "}"
+    ]
+  },
+  "ChangeNotifierProvider": {
+    "prefix": "cnProvider",
+    "description": "ChangeNotifierProvider widget",
+    "body": [
+      "ChangeNotifierProvider(",
+      "  create: (context) => ${1:My}Provider(),",
+      "  child: ${2:child},",
+      "),"
+    ]
+  },
+  "Consumer Widget": {
+    "prefix": "consumer",
+    "description": "Provider Consumer widget",
+    "body": [
+      "Consumer<${1:My}Provider>(",
+      "  builder: (context, ${2:provider}, child) {",
+      "    return $0;",
+      "  },",
+      "),"
+    ]
+  },
+  "Riverpod StateProvider": {
+    "prefix": "stateProvider",
+    "description": "Riverpod StateProvider",
+    "body": [
+      "final ${1:my}Provider = StateProvider<${2:int}>((ref) => ${3:0});"
+    ]
+  },
+  "Riverpod FutureProvider": {
+    "prefix": "futureProvider",
+    "description": "Riverpod FutureProvider",
+    "body": [
+      "final ${1:my}Provider = FutureProvider<${2:String}>((ref) async {",
+      "  $0",
+      "});"
+    ]
+  },
+  "Riverpod StreamProvider": {
+    "prefix": "streamProvider",
+    "description": "Riverpod StreamProvider",
+    "body": [
+      "final ${1:my}Provider = StreamProvider<${2:String}>((ref) async* {",
+      "  $0",
+      "});"
+    ]
+  },
+  "Riverpod NotifierProvider": {
+    "prefix": "notifierProvider",
+    "description": "Riverpod NotifierProvider with Notifier class",
+    "body": [
+      "final ${1:my}Provider = NotifierProvider<${2:My}Notifier, ${3:int}>(",
+      "  ${2:My}Notifier.new,",
+      ");",
+      "",
+      "class ${2:My}Notifier extends Notifier<${3:int}> {",
+      "  @override",
+      "  ${3:int} build() => ${4:0};",
+      "",
+      "  $0",
+      "}"
+    ]
+  },
+  "Riverpod AsyncNotifierProvider": {
+    "prefix": "asyncNotifierProvider",
+    "description": "Riverpod AsyncNotifierProvider with AsyncNotifier class",
+    "body": [
+      "final ${1:my}Provider = AsyncNotifierProvider<${2:My}Notifier, ${3:String}>(",
+      "  ${2:My}Notifier.new,",
+      ");",
+      "",
+      "class ${2:My}Notifier extends AsyncNotifier<${3:String}> {",
+      "  @override",
+      "  Future<${3:String}> build() async {",
+      "    $0",
+      "  }",
+      "}"
+    ]
+  },
+  "go_router Config": {
+    "prefix": "goRouter",
+    "description": "go_router GoRouter configuration",
+    "body": [
+      "final router = GoRouter(",
+      "  initialLocation: '/',",
+      "  routes: [",
+      "    GoRoute(",
+      "      path: '/',",
+      "      builder: (context, state) => const ${1:HomePage}(),",
+      "    ),",
+      "    GoRoute(",
+      "      path: '/${2:detail}',",
+      "      builder: (context, state) => const ${3:DetailPage}(),",
+      "    ),",
+      "    $0",
+      "  ],",
+      ");"
+    ]
+  },
+  "go_router GoRoute": {
+    "prefix": "goRoute",
+    "description": "A single GoRoute entry",
+    "body": [
+      "GoRoute(",
+      "  path: '/${1:path}',",
+      "  builder: (context, state) => const ${2:MyPage}(),",
+      "),$0"
+    ]
+  },
+  "go_router context.go": {
+    "prefix": "ctxGo",
+    "description": "Navigate with go_router context.go",
+    "body": [
+      "context.go('/${1:path}');$0"
+    ]
+  },
+  "go_router context.push": {
+    "prefix": "ctxPush",
+    "description": "Navigate with go_router context.push",
+    "body": [
+      "context.push('/${1:path}');$0"
+    ]
   }
 }
