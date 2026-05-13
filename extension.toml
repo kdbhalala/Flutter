@@ -14,26 +14,19 @@ languages = ["Dart"]
 repository = "https://github.com/UserNobody14/tree-sitter-dart"
 rev = "80e23c07b64494f7e21090bb3450223ef0b192f4"
 
-[[slash_commands]]
-name = "flutter"
+[slash_commands.flutter]
 description = "Run Flutter CLI commands"
-tooltip_text = "Run Flutter command"
 requires_argument = true
 
-[[slash_commands]]
-name = "fvm"
+[slash_commands.fvm]
 description = "Run FVM-managed Flutter CLI commands"
-tooltip_text = "Run FVM Flutter command"
 requires_argument = true
 
-[[slash_commands]]
-name = "dart"
+[slash_commands.dart]
 description = "Run Dart CLI commands (analyze, test, format, pub, etc.)"
-tooltip_text = "Run Dart command"
 requires_argument = true
 
 [debug_adapters.Dart]
-label = "Dart / Flutter"
 schema_path = "debug_adapter_schemas/Dart.json"
 
 [debug_locators.dart]
