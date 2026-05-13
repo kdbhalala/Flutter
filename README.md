@@ -207,6 +207,7 @@ Run via `cmd+shift+p` → **"task: spawn"**.
 |------|---------|
 | flutter: run | `flutter run` |
 | flutter: run (release) | `flutter run --release` |
+| flutter: run $ZED_STEM | `flutter run -t <current file>` |
 | flutter: run -d chrome | `flutter run -d chrome` |
 | flutter: run --web-renderer canvaskit | `flutter run --web-renderer canvaskit` |
 | flutter: test | `flutter test` |
@@ -372,13 +373,13 @@ Use in the Zed AI assistant panel.
 
 Runs `flutter <subcommand>` in the workspace root.
 
-Completions: `run`, `test`, `devices`, `doctor`, `attach`, `pub get`, `pub upgrade`, `pub outdated`, `emulators`, `clean`, `screenshot`, `gen-l10n`, `create`, `build apk`, `build apk --release`, `build appbundle`, `build ios`, `build ios --release`, `build ipa`, `build web`
+Completions are token-aware: top-level `run`, `test`, `devices`, `doctor`, `attach`, `pub`, `emulators`, `clean`, `screenshot`, `gen-l10n`, `create`, `build`, `upgrade`; then subcommand-specific suggestions like `run -d <device>`, `run --web-renderer <renderer>`, `test --coverage`, `pub run build_runner <build|watch>`, and `build <apk|appbundle|ios|ipa|web>`.
 
 ### `/dart <subcommand>`
 
 Runs `dart <subcommand>` in the workspace root.
 
-Completions: `run`, `test`, `analyze`, `format .`, `fix`, `pub get`, `pub upgrade`, `pub outdated`, `create`, `compile`, `doc`
+Completions are token-aware: `run`, `test`, `analyze`, `format`, `fix`, `pub`, `create`, `compile`, `doc`; plus deeper suggestions for `run build_runner <build|watch>`, `test --coverage=coverage`, `fix --apply`, `pub cache repair`, and `compile exe`.
 
 ### `/fvm flutter <subcommand>`
 
@@ -406,4 +407,3 @@ These VS Code Dart-Code features have no equivalent Zed extension API surface ye
 ## License
 
 MIT — see [LICENSE](LICENSE).
-

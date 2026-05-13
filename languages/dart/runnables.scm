@@ -31,7 +31,7 @@
         (arguments
           (argument
             (string_literal) @run)))))
-  (#set! tag dart-test)
+  (#set! tag flutter-test)
 )
 
 ; Detect blocTest('name', ...) calls from the bloc_test package

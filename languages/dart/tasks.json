@@ -21,6 +21,18 @@
     ]
   },
   {
+    "label": "flutter: run $ZED_STEM",
+    "command": "flutter",
+    "args": [
+      "run",
+      "-t",
+      "$ZED_FILE"
+    ],
+    "tags": [
+      "dart-main"
+    ]
+  },
+  {
     "label": "flutter: pub get",
     "command": "flutter",
     "args": [
@@ -93,7 +105,8 @@
       "$ZED_FILE"
     ],
     "tags": [
-      "flutter-test-file"
+      "flutter-test-file",
+      "flutter-test"
     ]
   },
   {
@@ -155,7 +168,8 @@
       "$ZED_FILE"
     ],
     "tags": [
-      "dart-run-file"
+      "dart-run-file",
+      "dart-main"
     ]
   },
   {
@@ -166,7 +180,9 @@
       "$ZED_FILE"
     ],
     "tags": [
-      "dart-test-file"
+      "dart-test-file",
+      "dart-test",
+      "dart-test-group"
     ]
   },
   {
