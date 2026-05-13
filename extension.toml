@@ -34,3 +34,6 @@ requires_argument = true
 
 [debug_adapters.Dart]
 label = "Dart / Flutter"
+schema_path = "debug_adapter_schemas/Dart.json"
+
+[debug_locators.dart]

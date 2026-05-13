@@ -7,7 +7,7 @@ use zed_extension_api::{
     self as zed, current_platform, serde_json, DebugAdapterBinary, DebugConfig, DebugRequest,
     DebugScenario, DebugTaskDefinition, Os, Result, SlashCommand, SlashCommandArgumentCompletion,
     SlashCommandOutput, StartDebuggingRequestArguments, StartDebuggingRequestArgumentsRequest,
-    Worktree,
+    TaskTemplate, Worktree,
 };
 
 struct DartBinary {
@@ -910,6 +910,96 @@ impl zed::Extension for FlutterExtension {
         Ok(SlashCommandOutput {
             text,
             sections: Vec::new(),
+        })
+    }
+
+    fn dap_locator_create_scenario(
+        &mut self,
+        _locator_name: String,
+        build_task: TaskTemplate,
+        _resolved_label: String,
+        debug_adapter_name: String,
+    ) -> Option<DebugScenario> {
+        if debug_adapter_name != "Dart" {
+            return None;
+        }
+
+        // Normalize the command to its basename so absolute paths work too.
+        let cmd_base = std::path::Path::new(&build_task.command)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or(build_task.command.as_str())
+            .trim_end_matches(".bat")
+            .to_lowercase();
+
+        // Resolve effective tool and args when FVM is the launcher.
+        let (tool, effective_args): (&str, &[String]) = if cmd_base == "fvm" {
+            match build_task.args.first().map(|s| s.as_str()) {
+                Some("flutter") => ("flutter", &build_task.args[1..]),
+                Some("dart") => ("dart", &build_task.args[1..]),
+                _ => return None,
+            }
+        } else if cmd_base == "flutter" || cmd_base == "flutter.bat" {
+            ("flutter", build_task.args.as_slice())
+        } else if cmd_base == "dart" || cmd_base == "dart.bat" {
+            ("dart", build_task.args.as_slice())
+        } else {
+            return None;
+        };
+
+        // Only convert tasks that actually launch a debuggable process.
+        let subcommand = effective_args.first().map(|s| s.as_str()).unwrap_or("");
+        let debug_type = match (tool, subcommand) {
+            ("flutter", "run") | ("flutter", "test") => "flutter",
+            ("dart", "run") | ("dart", "test") => "dart",
+            // `dart path/to/file.dart` direct invocation
+            ("dart", s) if s.ends_with(".dart") => "dart",
+            _ => return None,
+        };
+
+        // Extract program: first .dart arg, or default entry point.
+        let program = effective_args
+            .iter()
+            .find(|a| a.ends_with(".dart"))
+            .cloned()
+            .unwrap_or_else(|| {
+                if debug_type == "flutter" {
+                    "lib/main.dart".to_string()
+                } else {
+                    "bin/main.dart".to_string()
+                }
+            });
+
+        // Pass remaining non-dart-file args as program args.
+        let args: Vec<String> = effective_args
+            .iter()
+            .skip(1) // skip subcommand
+            .filter(|a| !a.ends_with(".dart") && a.as_str() != "run" && a.as_str() != "test")
+            .cloned()
+            .collect();
+
+        let use_fvm = cmd_base == "fvm";
+
+        let config_json = serde_json::json!({
+            "type": debug_type,
+            "request": "launch",
+            "program": program,
+            "cwd": build_task.cwd.clone().unwrap_or_default(),
+            "args": args,
+            "useFvm": use_fvm,
+            "flutterMode": "debug",
+            "debugSdkLibraries": false,
+            "debugExternalPackageLibraries": false,
+            "stopOnEntry": false,
+        })
+        .to_string();
+
+        Some(DebugScenario {
+            label: build_task.label.clone(),
+            adapter: "Dart".to_string(),
+            build: None,
+            config: config_json,
+            tcp_connection: None,
         })
     }
 }

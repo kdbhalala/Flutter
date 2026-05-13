@@ -92,6 +92,34 @@
         "release"
       ],
       "default": "debug"
+    },
+    "debugSdkLibraries": {
+      "type": "boolean",
+      "description": "Whether to enable debugging of Dart SDK libraries",
+      "default": false
+    },
+    "debugExternalPackageLibraries": {
+      "type": "boolean",
+      "description": "Whether to enable debugging of external package libraries",
+      "default": false
+    },
+    "additionalArgs": {
+      "type": "array",
+      "description": "Additional arguments passed to the flutter/dart tool (e.g. --dart-define=KEY=VALUE)",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "webRenderer": {
+      "type": "string",
+      "description": "Web renderer to use for Flutter web builds",
+      "enum": [
+        "auto",
+        "canvaskit",
+        "html",
+        "skwasm"
+      ]
     }
   },
   "required": [

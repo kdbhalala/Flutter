@@ -27,16 +27,16 @@
   "typedef" @context
   (type_identifier) @name) @item
 
-; Top-level functions
+; Top-level functions and class methods (function_signature matches both levels)
 (function_signature
   name: (_) @name) @item
 
-; Getters
+; Getters (top-level and class-level)
 (getter_signature
   "get" @context
   name: (_) @name) @item
 
-; Setters
+; Setters (top-level and class-level)
 (setter_signature
   "set" @context
   name: (_) @name) @item
@@ -49,9 +49,11 @@
   "factory" @context
   (identifier) @name) @item
 
+; Operator overloads (binary: ==, +, -, *, /, <, >, etc.)
+(operator_signature
+  "operator" @context
+  (binary_operator) @name) @item
+
 ; Static fields / constants
 (static_final_declaration
-  (identifier) @name) @item
-
-(initialized_identifier
   (identifier) @name) @item

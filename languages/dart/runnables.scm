@@ -34,6 +34,20 @@
   (#set! tag dart-test)
 )
 
+; Detect blocTest('name', ...) calls from the bloc_test package
+(
+  (expression_statement
+    (identifier) @_fn
+    (#eq? @_fn "blocTest")
+    .
+    (selector
+      (argument_part
+        (arguments
+          (argument
+            (string_literal) @run)))))
+  (#set! tag dart-test)
+)
+
 ; Detect group('name', ...) calls — runnable test group
 (
   (expression_statement

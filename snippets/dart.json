@@ -668,5 +668,442 @@
             "(${1:Type1} ${2:field1}, ${3:Type2} ${4:field2}) ${5:name};"
         ],
         "description": "Dart record type variable"
+    },
+
+    "Flutter StatelessWidget": {
+        "prefix": "stless",
+        "body": [
+            "class ${1:MyWidget} extends StatelessWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  Widget build(BuildContext context) {",
+            "    return ${2:Container()};",
+            "  }",
+            "}"
+        ],
+        "description": "Flutter StatelessWidget"
+    },
+    "Flutter StatefulWidget": {
+        "prefix": "stful",
+        "body": [
+            "class ${1:MyWidget} extends StatefulWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  State<${1:MyWidget}> createState() => _${1:MyWidget}State();",
+            "}",
+            "",
+            "class _${1:MyWidget}State extends State<${1:MyWidget}> {",
+            "  @override",
+            "  Widget build(BuildContext context) {",
+            "    return ${2:Container()};",
+            "  }",
+            "}"
+        ],
+        "description": "Flutter StatefulWidget"
+    },
+    "Flutter StatefulWidget with initState": {
+        "prefix": "stfulinit",
+        "body": [
+            "class ${1:MyWidget} extends StatefulWidget {",
+            "  const ${1:MyWidget}({super.key});",
+            "",
+            "  @override",
+            "  State<${1:MyWidget}> createState() => _${1:MyWidget}State();",
+            "}",
+            "",
+            "class _${1:MyWidget}State extends State<${1:MyWidget}> {",
+            "  @override",
+            "  void initState() {",
+            "    super.initState();",
+            "    $1",
+            "  }",
+            "",
+            "  @override",
+            "  void dispose() {",
+            "    super.dispose();",
+            "  }",
+            "",
+            "  @override",
+            "  Widget build(BuildContext context) {",
+            "    return ${2:Container()};",
+            "  }",
+            "}"
+        ],
+        "description": "Flutter StatefulWidget with initState and dispose"
+    },
+    "Flutter build override": {
+        "prefix": "build",
+        "body": [
+            "@override",
+            "Widget build(BuildContext context) {",
+            "  return $0;",
+            "}"
+        ],
+        "description": "Flutter build method override"
+    },
+    "Flutter initState override": {
+        "prefix": "initstate",
+        "body": [
+            "@override",
+            "void initState() {",
+            "  super.initState();",
+            "  $0",
+            "}"
+        ],
+        "description": "Flutter initState override"
+    },
+    "Flutter dispose override": {
+        "prefix": "dispose",
+        "body": [
+            "@override",
+            "void dispose() {",
+            "  $0",
+            "  super.dispose();",
+            "}"
+        ],
+        "description": "Flutter dispose override"
+    },
+    "Flutter didChangeDependencies override": {
+        "prefix": "didhange",
+        "body": [
+            "@override",
+            "void didChangeDependencies() {",
+            "  super.didChangeDependencies();",
+            "  $0",
+            "}"
+        ],
+        "description": "Flutter didChangeDependencies override"
+    },
+    "Flutter didUpdateWidget override": {
+        "prefix": "didupdate",
+        "body": [
+            "@override",
+            "void didUpdateWidget(${1:MyWidget} oldWidget) {",
+            "  super.didUpdateWidget(oldWidget);",
+            "  $0",
+            "}"
+        ],
+        "description": "Flutter didUpdateWidget override"
+    },
+    "Flutter setState": {
+        "prefix": "setstate",
+        "body": [
+            "setState(() {",
+            "  $0",
+            "});"
+        ],
+        "description": "Flutter setState call"
+    },
+    "Flutter SizedBox": {
+        "prefix": "sizedbox",
+        "body": [
+            "SizedBox(",
+            "  width: ${1:double.infinity},",
+            "  height: ${2:48},",
+            "  child: $0,",
+            ")"
+        ],
+        "description": "Flutter SizedBox widget"
+    },
+    "Flutter Column": {
+        "prefix": "col",
+        "body": [
+            "Column(",
+            "  mainAxisAlignment: MainAxisAlignment.${1:start},",
+            "  children: [",
+            "    $0",
+            "  ],",
+            ")"
+        ],
+        "description": "Flutter Column widget"
+    },
+    "Flutter Row": {
+        "prefix": "row",
+        "body": [
+            "Row(",
+            "  mainAxisAlignment: MainAxisAlignment.${1:start},",
+            "  children: [",
+            "    $0",
+            "  ],",
+            ")"
+        ],
+        "description": "Flutter Row widget"
+    },
+    "Flutter Scaffold": {
+        "prefix": "scaffold",
+        "body": [
+            "Scaffold(",
+            "  appBar: AppBar(",
+            "    title: const Text('${1:Title}'),",
+            "  ),",
+            "  body: $0,",
+            ")"
+        ],
+        "description": "Flutter Scaffold widget"
+    },
+    "Flutter MaterialApp": {
+        "prefix": "matapp",
+        "body": [
+            "MaterialApp(",
+            "  title: '${1:App}',",
+            "  theme: ThemeData(",
+            "    colorScheme: ColorScheme.fromSeed(seedColor: ${2:Colors.blue}),",
+            "    useMaterial3: true,",
+            "  ),",
+            "  home: const ${3:MyHomePage}(),",
+            ")"
+        ],
+        "description": "Flutter MaterialApp widget"
+    },
+    "Flutter StreamBuilder": {
+        "prefix": "streambuilder",
+        "body": [
+            "StreamBuilder<${1:Type}>(",
+            "  stream: ${2:stream},",
+            "  builder: (context, snapshot) {",
+            "    if (snapshot.hasError) return Text('Error: \\${snapshot.error}');",
+            "    if (!snapshot.hasData) return const CircularProgressIndicator();",
+            "    final data = snapshot.data!;",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter StreamBuilder widget"
+    },
+    "Flutter FutureBuilder": {
+        "prefix": "futurebuilder",
+        "body": [
+            "FutureBuilder<${1:Type}>(",
+            "  future: ${2:future},",
+            "  builder: (context, snapshot) {",
+            "    if (snapshot.hasError) return Text('Error: \\${snapshot.error}');",
+            "    if (!snapshot.hasData) return const CircularProgressIndicator();",
+            "    final data = snapshot.data!;",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter FutureBuilder widget"
+    },
+    "Flutter ValueListenableBuilder": {
+        "prefix": "valuelistenablebuilder",
+        "body": [
+            "ValueListenableBuilder<${1:Type}>(",
+            "  valueListenable: ${2:listenable},",
+            "  builder: (context, value, child) {",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter ValueListenableBuilder"
+    },
+    "Flutter AnimatedBuilder": {
+        "prefix": "animbuilder",
+        "body": [
+            "AnimatedBuilder(",
+            "  animation: ${1:animation},",
+            "  builder: (context, child) {",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter AnimatedBuilder widget"
+    },
+    "Flutter GestureDetector": {
+        "prefix": "gesture",
+        "body": [
+            "GestureDetector(",
+            "  onTap: () {",
+            "    $0",
+            "  },",
+            "  child: ${1:Container()},",
+            ")"
+        ],
+        "description": "Flutter GestureDetector widget"
+    },
+    "Flutter InkWell": {
+        "prefix": "inkwell",
+        "body": [
+            "InkWell(",
+            "  onTap: () {",
+            "    $0",
+            "  },",
+            "  child: ${1:Container()},",
+            ")"
+        ],
+        "description": "Flutter InkWell widget"
+    },
+    "Flutter ElevatedButton": {
+        "prefix": "elevbtn",
+        "body": [
+            "ElevatedButton(",
+            "  onPressed: () {",
+            "    $0",
+            "  },",
+            "  child: const Text('${1:Button}'),",
+            ")"
+        ],
+        "description": "Flutter ElevatedButton"
+    },
+    "Flutter TextButton": {
+        "prefix": "textbtn",
+        "body": [
+            "TextButton(",
+            "  onPressed: () {",
+            "    $0",
+            "  },",
+            "  child: const Text('${1:Button}'),",
+            ")"
+        ],
+        "description": "Flutter TextButton"
+    },
+    "Flutter IconButton": {
+        "prefix": "iconbtn",
+        "body": [
+            "IconButton(",
+            "  onPressed: () {",
+            "    $0",
+            "  },",
+            "  icon: const Icon(Icons.${1:add}),",
+            ")"
+        ],
+        "description": "Flutter IconButton"
+    },
+    "Flutter Text": {
+        "prefix": "txt",
+        "body": [
+            "Text(",
+            "  '${1:text}',",
+            "  style: const TextStyle(",
+            "    fontSize: ${2:16},",
+            "    fontWeight: FontWeight.${3:normal},",
+            "  ),",
+            ")"
+        ],
+        "description": "Flutter Text widget with style"
+    },
+    "Flutter Padding": {
+        "prefix": "pad",
+        "body": [
+            "Padding(",
+            "  padding: const EdgeInsets.all(${1:16}),",
+            "  child: $0,",
+            ")"
+        ],
+        "description": "Flutter Padding widget"
+    },
+    "Flutter Container": {
+        "prefix": "container",
+        "body": [
+            "Container(",
+            "  padding: const EdgeInsets.all(${1:16}),",
+            "  decoration: BoxDecoration(",
+            "    color: ${2:Colors.white},",
+            "    borderRadius: BorderRadius.circular(${3:8}),",
+            "  ),",
+            "  child: $0,",
+            ")"
+        ],
+        "description": "Flutter Container with decoration"
+    },
+    "Flutter ListView.builder": {
+        "prefix": "listviewb",
+        "body": [
+            "ListView.builder(",
+            "  itemCount: ${1:items}.length,",
+            "  itemBuilder: (context, index) {",
+            "    final item = ${1:items}[index];",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter ListView.builder"
+    },
+    "Flutter GridView.builder": {
+        "prefix": "gridviewb",
+        "body": [
+            "GridView.builder(",
+            "  itemCount: ${1:items}.length,",
+            "  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(",
+            "    crossAxisCount: ${2:2},",
+            "  ),",
+            "  itemBuilder: (context, index) {",
+            "    final item = ${1:items}[index];",
+            "    return $0;",
+            "  },",
+            ")"
+        ],
+        "description": "Flutter GridView.builder"
+    },
+    "Flutter Navigator.push": {
+        "prefix": "navpush",
+        "body": [
+            "Navigator.of(context).push(",
+            "  MaterialPageRoute(builder: (context) => const ${1:MyPage}()),",
+            ");"
+        ],
+        "description": "Flutter Navigator.push"
+    },
+    "Flutter Navigator.pushNamed": {
+        "prefix": "navnamed",
+        "body": [
+            "Navigator.of(context).pushNamed('${1:/route}');"
+        ],
+        "description": "Flutter Navigator.pushNamed"
+    },
+    "Flutter showSnackBar": {
+        "prefix": "snackbar",
+        "body": [
+            "ScaffoldMessenger.of(context).showSnackBar(",
+            "  const SnackBar(content: Text('${1:Message}')),",
+            ");"
+        ],
+        "description": "Flutter showSnackBar"
+    },
+    "Flutter showDialog": {
+        "prefix": "dialog",
+        "body": [
+            "showDialog<void>(",
+            "  context: context,",
+            "  builder: (context) => AlertDialog(",
+            "    title: const Text('${1:Title}'),",
+            "    content: const Text('${2:Content}'),",
+            "    actions: [",
+            "      TextButton(",
+            "        onPressed: () => Navigator.of(context).pop(),",
+            "        child: const Text('OK'),",
+            "      ),",
+            "    ],",
+            "  ),",
+            ");"
+        ],
+        "description": "Flutter showDialog with AlertDialog"
+    },
+    "Flutter Theme.of": {
+        "prefix": "theme",
+        "body": [
+            "Theme.of(context).${1:colorScheme}"
+        ],
+        "description": "Flutter Theme.of(context)"
+    },
+    "Flutter MediaQuery.of": {
+        "prefix": "mediaquery",
+        "body": [
+            "MediaQuery.of(context).${1:size}"
+        ],
+        "description": "Flutter MediaQuery.of(context)"
+    },
+    "Flutter widgetTest": {
+        "prefix": "widgettest",
+        "body": [
+            "testWidgets('${1:description}', (WidgetTester tester) async {",
+            "  await tester.pumpWidget(const ${2:MyWidget}());",
+            "  $0",
+            "  await tester.pump();",
+            "});"
+        ],
+        "description": "Flutter widget test"
     }
 }
