@@ -1,6 +1,24 @@
 # Contributing to Flutter for Zed
 
-This is a Zed editor extension written in Rust that compiles to WebAssembly. It provides Flutter and Dart language support via the Dart Analysis Server (LSP), the Flutter/Dart debug adapter (DAP), Tree-sitter syntax, tasks, and slash commands.
+This is a Zed editor extension written in Rust that compiles to WebAssembly. It provides Flutter and Dart language support via the Dart Analysis Server (LSP), the Flutter/Dart debug adapter (DAP), tasks, snippets, and slash commands.
+
+---
+
+## Publishing Prerequisites
+
+Before submitting a PR for publication to the Zed extensions registry, ensure you have completed the [Extension Publishing Prerequisites](https://zed.dev/docs/extensions/developing-extensions#extension-publishing-prerequisites):
+
+- ✅ **License**: MIT license included (see [LICENSE](LICENSE))
+- ✅ **Manifest**: Valid `extension.toml` with all required fields
+- ✅ **Documentation**: Comprehensive README and CONTRIBUTING guide
+- ⚠️ **Testing**: Manual verification in Zed is required (see [Testing](#testing) below)
+- ⚠️ **No duplication**: Verify this extension doesn't duplicate functionality already provided by another extension
+
+### Duplicate Functionality Check
+
+Before opening a PR for publication, search the [Zed extensions registry](https://github.com/zed-industries/extensions) to ensure:
+- No other extension provides Flutter or Dart language support
+- If functionality overlaps with existing extensions, consider contributing fixes to those instead
 
 ---
 
@@ -29,6 +47,7 @@ flutter/
 │           └── scanner.c          # External scanner (strings, interpolation)
 ├── debug_adapter_schemas/
 │   └── Dart.json                  # Debug configuration JSON schema
+├── CHANGELOG.md                   # Version history and release notes
 └── PORTING_PLAN.md                # What is done, what is blocked
 ```
 
@@ -81,6 +100,29 @@ Alternatively, add to `~/.config/zed/settings.json`:
   "dev_extensions": ["/path/to/this/repo"]
 }
 ```
+
+---
+
+## Testing
+
+Before submitting a PR, you **must** test the extension locally as a dev extension in Zed. PRs for extensions that clearly don't work will be closed.
+
+### Manual Testing Checklist
+
+- [ ] **Build succeeds**: `cargo build --target wasm32-wasip1` completes without errors
+- [ ] **Dev extension loads**: "zed: install dev extension" successfully loads the extension in Zed
+- [ ] **Dart files recognized**: Dart syntax highlighting works in `.dart` files
+- [ ] **LSP works**: Autocomplete, go-to-definition, and diagnostics function correctly
+- [ ] **Tasks execute**: Run at least one Flutter and one Dart task via `cmd+shift+p` → **"task: spawn"**
+- [ ] **Slash commands respond**: Test `/flutter`, `/dart`, and `/fvm` slash commands in the assistant
+- [ ] **Debug session launches**: Create a simple Flutter project and verify debug configuration works
+- [ ] **No console errors**: Check Zed's extension logs (View → Toggle Extension Logs) for errors
+
+### Testing with Sample Projects
+
+For comprehensive testing, use:
+- **Flutter project**: `flutter create test_app && cd test_app`
+- **Dart CLI project**: `dart create -t console test_cli`
 
 ---
 
@@ -142,7 +184,7 @@ The debug adapter binary is `flutter debug_adapter` (for Flutter) or `dart debug
 
 ### `dap_config_to_scenario`
 
-Called when the user creates a new debug session from the Zed UI (not from `.zed/debug.json`). Reads `pubspec.yaml` in the `cwd` to determine `"flutter"` vs `"dart"` type. Falls back to `"flutter"`.
+Called when the user creates a new debug session from the Zed UI (not from `.zed/debug.json`). Reads `pubspec.yaml` in the `cwd` to determine `"flutter"` vs `"dart"` type. Falls back to `"flutter"` if detection fails.
 
 ### Slash commands
 
@@ -272,14 +314,50 @@ See `PORTING_PLAN.md` for full status.
 
 ---
 
+## Version and Release Process
+
+This project follows [semantic versioning](https://semver.org/).
+
+### Before releasing a new version
+
+1. Update `version` in `extension.toml`
+2. Add release notes to `CHANGELOG.md` with:
+   - Version number and date
+   - List of features, fixes, and breaking changes
+   - Link to commit range: `https://github.com/kdbhalala/Flutter/compare/v<old>...v<new>`
+3. Test the extension thoroughly (see [Testing](#testing) section)
+4. Push changes and create a Git tag: `git tag v<version>`
+5. Push the tag: `git push origin v<version>`
+
+Example `CHANGELOG.md` entry:
+
+```markdown
+## [0.3.0] — 2026-05-22
+
+### Added
+- New `/fvm` slash command for FVM-managed Flutter workflows
+- Support for Dart 3.2 patterns and records
+
+### Fixed
+- Device ID resolution for Android emulators
+
+### Changed
+- Improved SDK detection order for asdf/mise users
+
+[0.3.0]: https://github.com/kdbhalala/Flutter/compare/v0.2.0...v0.3.0
+```
+
+---
+
 ## Submitting a pull request
 
 1. Fork the repo and create a feature branch.
 2. Make changes — run `cargo build --target wasm32-wasip1` and fix all errors.
-3. Test in Zed via **"zed: install dev extension"**.
-4. Open a PR with a description of what changed and why.
+3. Test in Zed via **"zed: install dev extension"** (see [Testing](#testing) section).
+4. Update `CHANGELOG.md` with your changes if adding features or fixes.
+5. Open a PR with a description of what changed and why.
 
-There are no automated tests yet — manual verification in Zed is the current standard.
+**Testing is mandatory**: PRs for extensions that clearly don't work will be closed per Zed guidelines.
 
 ---
 
