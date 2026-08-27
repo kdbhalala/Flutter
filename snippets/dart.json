@@ -1388,5 +1388,140 @@
     "body": [
       "context.push('/${1:path}');$0"
     ]
+  },
+  "Flutter StatefulWidget with AnimationController": {
+    "prefix": "stanim",
+    "description": "StatefulWidget with SingleTickerProviderStateMixin and AnimationController",
+    "body": [
+      "class ${1:MyWidget} extends StatefulWidget {",
+      "  const ${1:MyWidget}({super.key});",
+      "",
+      "  @override",
+      "  State<${1:MyWidget}> createState() => _${1:MyWidget}State();",
+      "}",
+      "",
+      "class _${1:MyWidget}State extends State<${1:MyWidget}> with SingleTickerProviderStateMixin {",
+      "  late final AnimationController _controller;",
+      "",
+      "  @override",
+      "  void initState() {",
+      "    super.initState();",
+      "    _controller = AnimationController(",
+      "      duration: const Duration(${2:milliseconds: 300}),",
+      "      vsync: this,",
+      "    );",
+      "  }",
+      "",
+      "  @override",
+      "  void dispose() {",
+      "    _controller.dispose();",
+      "    super.dispose();",
+      "  }",
+      "",
+      "  @override",
+      "  Widget build(BuildContext context) {",
+      "    return $0;",
+      "  }",
+      "}"
+    ]
+  },
+  "Flutter Bloc": {
+    "prefix": "bloc",
+    "description": "flutter_bloc Bloc class",
+    "body": [
+      "class ${1:Subject}Bloc extends Bloc<${1:Subject}Event, ${1:Subject}State> {",
+      "  ${1:Subject}Bloc() : super(${1:Subject}Initial()) {",
+      "    on<${2:Load${1:Subject}}>((event, emit) async {",
+      "      $0",
+      "    });",
+      "  }",
+      "}"
+    ]
+  },
+  "Flutter Cubit": {
+    "prefix": "cubit",
+    "description": "flutter_bloc Cubit class",
+    "body": [
+      "class ${1:Subject}Cubit extends Cubit<${1:Subject}State> {",
+      "  ${1:Subject}Cubit() : super(${1:Subject}Initial());",
+      "",
+      "  void ${2:load}() {",
+      "    $0",
+      "  }",
+      "}"
+    ]
+  },
+  "Flutter BlocBuilder": {
+    "prefix": "blocbuilder",
+    "description": "flutter_bloc BlocBuilder widget",
+    "body": [
+      "BlocBuilder<${1:Bloc}, ${2:State}>(",
+      "  builder: (context, state) {",
+      "    return $0;",
+      "  },",
+      ")"
+    ]
+  },
+  "Flutter BlocConsumer": {
+    "prefix": "blocconsumer",
+    "description": "flutter_bloc BlocConsumer widget",
+    "body": [
+      "BlocConsumer<${1:Bloc}, ${2:State}>(",
+      "  listener: (context, state) {",
+      "    $1",
+      "  },",
+      "  builder: (context, state) {",
+      "    return $0;",
+      "  },",
+      ")"
+    ]
+  },
+  "Flutter CustomPainter": {
+    "prefix": "custompainter",
+    "description": "CustomPainter class implementation",
+    "body": [
+      "class ${1:My}Painter extends CustomPainter {",
+      "  @override",
+      "  void paint(Canvas canvas, Size size) {",
+      "    final paint = Paint()",
+      "      ..color = ${2:Colors.blue}",
+      "      ..style = PaintingStyle.fill;",
+      "    $0",
+      "  }",
+      "",
+      "  @override",
+      "  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;",
+      "}"
+    ]
+  },
+  "Flutter InheritedWidget": {
+    "prefix": "inheritedwidget",
+    "description": "InheritedWidget class with of(context) lookup",
+    "body": [
+      "class ${1:My}InheritedWidget extends InheritedWidget {",
+      "  const ${1:My}InheritedWidget({",
+      "    super.key,",
+      "    required this.${2:data},",
+      "    required super.child,",
+      "  });",
+      "",
+      "  final ${3:Type} ${2:data};",
+      "",
+      "  static ${1:My}InheritedWidget? maybeOf(BuildContext context) {",
+      "    return context.dependOnInheritedWidgetOfExactType<${1:My}InheritedWidget>();",
+      "  }",
+      "",
+      "  static ${1:My}InheritedWidget of(BuildContext context) {",
+      "    final result = maybeOf(context);",
+      "    assert(result != null, 'No ${1:My}InheritedWidget found in context');",
+      "    return result!;",
+      "  }",
+      "",
+      "  @override",
+      "  bool updateShouldNotify(covariant ${1:My}InheritedWidget oldWidget) {",
+      "    return ${2:data} != oldWidget.${2:data};",
+      "  }",
+      "}"
+    ]
   }
 }
