@@ -4,12 +4,12 @@
 
 ; ===== Keywords =====
 
-; Control flow keywords
+; Control flow
 [
   (assert_builtin)
   (break_builtin)
+  (case_builtin)
   (rethrow_builtin)
-  "break"
   "case"
   "catch"
   "continue"
@@ -30,13 +30,13 @@
 
 ; Import / library directives
 [
+  (part_of_builtin)
   "deferred"
   "export"
   "hide"
   "import"
   "library"
   "part"
-  (part_of_builtin)
   "show"
 ] @keyword.import
 
@@ -47,26 +47,28 @@
   "await"
   "sync*"
   "yield"
-] @keyword
+] @keyword.coroutine
 
-; Declaration and modifier keywords
+; Declarations and modifiers
 [
+  (const_builtin)
+  (final_builtin)
+  (inferred_type)
+  (void_type)
   "abstract"
   "as"
   "base"
   "class"
-  (const_builtin)
   "covariant"
+  "dynamic"
   "enum"
   "extends"
   "extension"
   "external"
   "factory"
-  "final"
   "Function"
   "get"
   "implements"
-  (inferred_type)
   "interface"
   "is"
   "late"
@@ -78,15 +80,11 @@
   "sealed"
   "set"
   "static"
-  "super"
-  "this"
   "typedef"
-  "var"
-  (void_type)
   "with"
 ] @keyword
 
-; "this" and "super" are special built-in variables, not plain keywords
+; Special built-in variables
 (this) @variable.special
 (super) @variable.special
 
@@ -98,12 +96,12 @@
 ((type_identifier) @type.builtin
   (#match? @type.builtin "^(bool|double|Duration|dynamic|Enum|Error|Exception|Function|Future|int|Iterable|Iterator|List|Map|Never|Null|num|Object|Record|RegExp|Runes|Set|StackTrace|Stream|String|Symbol|Type|Uri)$"))
 
-; Class / mixin / enum / extension names
+; Class / mixin / enum / extension definitions
 (class_definition
   name: (identifier) @type)
 
 (mixin_declaration
-  name: (identifier) @type)
+  (identifier) @type)
 
 (enum_declaration
   name: (identifier) @type)
@@ -111,11 +109,11 @@
 (extension_declaration
   name: (identifier) @type)
 
-; Typedef targets
+; Typedef aliases
 (type_alias
   (type_identifier) @type)
 
-; Scoped identifier scope is usually a type (e.g. MyClass.method)
+; Scoped identifiers
 (scoped_identifier
   scope: (identifier) @type)
 
@@ -124,7 +122,7 @@
   name: (identifier) @type)
   (#match? @type "^[a-zA-Z]"))
 
-; Capitalized identifiers are typically types
+; Capitalized identifiers heuristic
 ((identifier) @type
   (#match? @type "^_?[A-Z].*[a-z]"))
 
@@ -147,7 +145,7 @@
 (setter_signature
   name: (identifier) @function)
 
-; Function calls (heuristic: lowercase identifier immediately before argument list)
+; Function calls (heuristic: lowercase identifier before argument list)
 (((identifier) @function
   (#match? @function "^_?[a-z]"))
   .
@@ -155,7 +153,7 @@
     .
     (argument_part))) @function
 
-; Method calls via chained selectors
+; Method calls via selectors
 ((selector
   (unconditional_assignable_selector
     (identifier) @function.method))
@@ -179,20 +177,6 @@
   (argument_part
     (arguments)))
 
-((unconditional_assignable_selector
-  (identifier) @function.method)
-  .
-  (selector
-    (argument_part
-      (arguments))))
-
-((conditional_assignable_selector
-  (identifier) @function.method)
-  .
-  (selector
-    (argument_part
-      (arguments))))
-
 ; ===== Annotations =====
 
 (annotation
@@ -211,7 +195,7 @@
   (cascade_selector
     (identifier) @property))
 
-; ===== Enum Members =====
+; ===== Enum Constants =====
 
 (enum_constant
   name: (identifier) @constant)
@@ -230,7 +214,7 @@
 (assignment_expression
   left: (assignable_expression) @variable)
 
-; ===== Operators =====
+; ===== Template Substitutions & Escapes =====
 
 (template_substitution
   "$" @punctuation.special
@@ -242,6 +226,8 @@
   (identifier_dollar_escaped) @variable) @none
 
 (escape_sequence) @string.escape
+
+; ===== Operators =====
 
 [
   "@"
@@ -269,7 +255,7 @@
   (additive_operator)
 ] @operator
 
-; Type argument / parameter angle brackets are punctuation
+; Type argument / parameter brackets
 (type_arguments
   "<" @punctuation.bracket
   ">" @punctuation.bracket)
@@ -314,117 +300,24 @@
 (comment) @comment
 (documentation_comment) @comment.doc
 
-; Keywords - definitions
-[
-  (case_builtin)
-  (void_type)
-  "late"
-  "required"
-  "extension"
-  "on"
-  "class"
-  "enum"
-  "extends"
-  "in"
-  "is"
-  "new"
-  "super"
-  "with"
-  "Function"
-] @keyword.definition
-
-"return" @keyword.return
-
-[
-  (part_of_builtin)
-  "deferred"
-  "factory"
-  "get"
-  "implements"
-  "interface"
-  "library"
-  "operator"
-  "mixin"
-  "part"
-  "set"
-  "typedef"
-] @keyword
-
-[
-  "async"
-  "async*"
-  "sync*"
-  "await"
-  "yield"
-] @keyword.coroutine
-
-[
-  (const_builtin)
-  (final_builtin)
-  "abstract"
-  "covariant"
-  "dynamic"
-  "external"
-  "static"
-  "final"
-  "base"
-  "sealed"
-] @keyword.modifier
-
-((identifier) @variable.builtin
-  (#any-of? @variable.builtin
-    "abstract" "as" "covariant" "deferred" "dynamic" "export" "external" "factory" "Function" "get"
-    "implements" "import" "interface" "library" "operator" "mixin" "part" "set" "static" "typedef"))
-
-[
-  "if"
-  "else"
-  "switch"
-  "default"
-  "case"
-] @keyword.conditional
-
-[
-  "try"
-  "throw"
-  "catch"
-  "finally"
-  (break_statement)
-] @keyword.exception
-
-[
-  "do"
-  "while"
-  "continue"
-  "for"
-] @keyword.repeat
-
 ; ===== Dart 3: Patterns & Switch Expressions =====
 
-; switch expression arrow (=>) — same as fat arrow operator
 (switch_expression_case
   "=>" @operator)
 
-; guard clause in patterns
 (guard
-  "when" @keyword.conditional)
+  "when" @keyword.control)
 
-; record literals: (x: 1, y: 2)
 (record_literal) @none
-
-; record type annotations: (int, String) or (x: int)
 (record_type) @type
 (record_type_named_field
   name: (identifier) @variable.parameter)
 
-; pattern variable bindings
 (variable_pattern
   (identifier) @variable)
 
-; wildcard pattern _
 (wildcard_pattern
   "_" @variable.special)
 
-; rest pattern ...
 (rest_pattern
   "..." @operator)
