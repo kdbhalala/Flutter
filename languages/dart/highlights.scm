@@ -305,9 +305,6 @@
 (switch_expression_case
   "=>" @operator)
 
-(guard
-  "when" @keyword.control)
-
 (record_literal) @none
 (record_type) @type
 (record_type_named_field
@@ -315,9 +312,6 @@
 
 (variable_pattern
   (identifier) @variable)
-
-(wildcard_pattern
-  "_" @variable.special)
 
 (rest_pattern
   "..." @operator)
