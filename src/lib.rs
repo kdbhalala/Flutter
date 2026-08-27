@@ -559,21 +559,40 @@ impl zed::Extension for FlutterExtension {
                 .unwrap_or(default)
         };
 
+        let inlay_hints_settings = user_settings
+            .as_ref()
+            .and_then(|s| s.get("inlayHints"))
+            .and_then(|h| h.as_object());
+
+        let get_inlay_bool = |key: &str, default: bool| -> bool {
+            inlay_hints_settings
+                .and_then(|h| h.get(key))
+                .and_then(|v| v.as_bool())
+                .unwrap_or(default)
+        };
+
         Ok(Some(serde_json::json!({
             // Only analyze Dart projects that have files open in the editor.
-            // This significantly improves performance in multi-project workspaces.
             "onlyAnalyzeProjectsWithOpenFiles": get_bool("onlyAnalyzeProjectsWithOpenFiles", true),
             // Surface completion items from libraries not yet imported.
-            // Enables auto-import on accept.
             "suggestFromUnimportedLibraries": get_bool("suggestFromUnimportedLibraries", true),
             // Show closing labels for long Flutter widget trees.
-            "closingLabels": get_bool("closingLabels", false),
+            "closingLabels": get_bool("closingLabels", true),
+            // Complete function calls with parentheses / arguments.
+            "completeFunctionCalls": get_bool("completeFunctionCalls", true),
             // Enable document outline support.
             "outline": true,
-            // Enable Flutter widget outline support (widget tree panel).
+            // Enable Flutter widget outline support.
             "flutterOutline": true,
             // Allow the language server to open URIs (for dart fix, etc.).
             "allowOpenUri": true,
+            // Inlay hints for parameter names, variable types, and return types.
+            "inlayHints": {
+                "showForParameters": get_inlay_bool("showForParameters", true),
+                "showForVariableTypes": get_inlay_bool("showForVariableTypes", true),
+                "showForFunctionReturnTypes": get_inlay_bool("showForFunctionReturnTypes", true),
+                "showForChainedCalls": get_inlay_bool("showForChainedCalls", true),
+            }
         })))
     }
 
