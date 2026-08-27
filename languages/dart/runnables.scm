@@ -48,6 +48,34 @@
   (#set! tag dart-test)
 )
 
+; Detect testGoldens('name', ...) calls from golden_toolkit
+(
+  (expression_statement
+    (identifier) @_fn
+    (#eq? @_fn "testGoldens")
+    .
+    (selector
+      (argument_part
+        (arguments
+          (argument
+            (string_literal) @run)))))
+  (#set! tag flutter-test)
+)
+
+; Detect patrolTest('name', ...) calls from patrol
+(
+  (expression_statement
+    (identifier) @_fn
+    (#eq? @_fn "patrolTest")
+    .
+    (selector
+      (argument_part
+        (arguments
+          (argument
+            (string_literal) @run)))))
+  (#set! tag flutter-test)
+)
+
 ; Detect group('name', ...) calls — runnable test group
 (
   (expression_statement
