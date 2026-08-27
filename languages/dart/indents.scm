@@ -59,8 +59,6 @@
 ; List / map / set literals
 (list_literal
   "[" "]" @end) @indent
-(map_literal
-  "{" "}" @end) @indent
 (set_or_map_literal
   "{" "}" @end) @indent
 
