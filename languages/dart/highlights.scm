@@ -299,19 +299,3 @@
 
 (comment) @comment
 (documentation_comment) @comment.doc
-
-; ===== Dart 3: Patterns & Switch Expressions =====
-
-(switch_expression_case
-  "=>" @operator)
-
-(record_literal) @none
-(record_type) @type
-(record_type_named_field
-  name: (identifier) @variable.parameter)
-
-(variable_pattern
-  (identifier) @variable)
-
-(rest_pattern
-  "..." @operator)
