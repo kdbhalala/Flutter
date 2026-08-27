@@ -69,12 +69,40 @@ fn detect_debug_type(cwd: &str, program: Option<&str>) -> &'static str {
     "dart"
 }
 
+/// Helper to find SDK binaries in known version manager and workspace locations
+fn find_version_manager_tool(worktree: &Worktree, tool: &str) -> Option<String> {
+    // 1. Workspace-local FVM symlink: .fvm/flutter_sdk/bin/<tool>
+    let local_fvm = format!("{}/.fvm/flutter_sdk/bin/{}", worktree.root_path(), tool);
+    if std::path::Path::new(&local_fvm).exists() {
+        return Some(local_fvm);
+    }
+
+    let env = worktree.shell_env();
+    let (_, home) = env.iter().find(|(k, _)| k == "HOME")?;
+
+    // 2. Global FVM, Puro, Proto, asdf, mise
+    for candidate in [
+        format!("{}/.fvm/default/bin/{}", home, tool),
+        format!("{}/.puro/envs/default/bin/{}", home, tool),
+        format!("{}/.puro/bin/{}", home, tool),
+        format!("{}/.proto/shims/{}", home, tool),
+        format!("{}/.proto/bin/{}", home, tool),
+        format!("{}/.asdf/shims/{}", home, tool),
+        format!("{}/.local/share/mise/shims/{}", home, tool),
+    ] {
+        if std::path::Path::new(&candidate).exists() {
+            return Some(candidate);
+        }
+    }
+    None
+}
+
 /// Resolve flutter/dart tool path with priority:
 /// 1. FVM binary (if use_fvm)
 /// 2. dart.sdkPath / dart.flutterSdkPath from LSP settings
-/// 3. PATH via worktree.which
-/// 4. FLUTTER_ROOT env var → <root>/bin/<tool>
-/// 5. Version manager paths checked for existence: FVM default → asdf → mise
+/// 3. Workspace-local or global version manager (FVM, Puro, Proto, asdf, mise)
+/// 4. PATH via worktree.which
+/// 5. FLUTTER_ROOT env var → <root>/bin/<tool>
 fn flutter_tool_path(worktree: &Worktree, tool: &str, use_fvm: bool) -> String {
     if use_fvm {
         return worktree.which("fvm").unwrap_or_else(|| "fvm".to_string());
@@ -82,24 +110,15 @@ fn flutter_tool_path(worktree: &Worktree, tool: &str, use_fvm: bool) -> String {
     if let Some(sdk_bin) = sdk_path_from_settings(worktree, tool) {
         return sdk_bin;
     }
+    if let Some(vm_tool) = find_version_manager_tool(worktree, tool) {
+        return vm_tool;
+    }
     if let Some(path) = worktree.which(tool) {
         return path;
     }
     let env = worktree.shell_env();
     if let Some((_, root)) = env.iter().find(|(k, _)| k == "FLUTTER_ROOT") {
         return format!("{}/bin/{}", root, tool);
-    }
-    if let Some((_, home)) = env.iter().find(|(k, _)| k == "HOME") {
-        let home = home.clone();
-        for candidate in [
-            format!("{}/.fvm/default/bin/{}", home, tool),
-            format!("{}/.asdf/shims/{}", home, tool),
-            format!("{}/.local/share/mise/shims/{}", home, tool),
-        ] {
-            if std::path::Path::new(&candidate).exists() {
-                return candidate;
-            }
-        }
     }
     tool.to_string()
 }
@@ -478,6 +497,14 @@ impl FlutterExtension {
             });
         }
 
+        // Workspace or global version managers: FVM -> Puro -> Proto -> asdf -> mise
+        if let Some(vm_dart) = find_version_manager_tool(worktree, "dart") {
+            return Ok(DartBinary {
+                path: vm_dart,
+                args: binary_args,
+            });
+        }
+
         if let Some(path) = worktree.which("dart") {
             return Ok(DartBinary {
                 path,
@@ -492,23 +519,6 @@ impl FlutterExtension {
                 path: format!("{}/bin/dart", root),
                 args: binary_args,
             });
-        }
-
-        // Version-manager fallbacks: FVM default → asdf shims → mise shims
-        if let Some((_, home)) = env.iter().find(|(k, _)| k == "HOME") {
-            let home = home.clone();
-            for candidate in [
-                format!("{}/.fvm/default/bin/dart", home),
-                format!("{}/.asdf/shims/dart", home),
-                format!("{}/.local/share/mise/shims/dart", home),
-            ] {
-                if std::path::Path::new(&candidate).exists() {
-                    return Ok(DartBinary {
-                        path: candidate,
-                        args: binary_args.clone(),
-                    });
-                }
-            }
         }
 
         Err("dart must be installed from dart.dev/get-dart or pointed to by the LSP binary settings".to_string())
