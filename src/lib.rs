@@ -969,3 +969,138 @@ impl zed::Extension for FlutterExtension {
 }
 
 zed::register_extension!(FlutterExtension);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use zed_extension_api::serde_json::json;
+
+    /// Shaped exactly like real `flutter devices --machine` output.
+    fn devices() -> Vec<serde_json::Value> {
+        vec![
+            json!({
+                "name": "iPhone SE (3rd generation)",
+                "id": "58BE4EB6-5BDE-4FD2-AB17-6046C3C05BC8",
+                "targetPlatform": "ios",
+            }),
+            json!({"name": "macOS", "id": "macos", "targetPlatform": "darwin"}),
+            json!({"name": "Chrome", "id": "chrome", "targetPlatform": "web-javascript"}),
+            json!({"name": "Pixel 7", "id": "1B241KQ", "targetPlatform": "android-arm64"}),
+        ]
+    }
+
+    fn resolved(search: &str) -> String {
+        match_device(&devices(), search)
+            .unwrap_or_else(|e| panic!("{search:?} should resolve, got Err: {e}"))
+            .unwrap_or_else(|| panic!("{search:?} should resolve, got Ok(None)"))
+    }
+
+    // Platform aliases: what the Flutter CLI accepts via `-d`. Regression test
+    // for `device_id: "ios"` failing a debug session outright, because it
+    // matched none of the id/name rules.
+    #[test]
+    fn resolves_platform_aliases() {
+        assert_eq!(resolved("ios"), "58BE4EB6-5BDE-4FD2-AB17-6046C3C05BC8");
+        assert_eq!(resolved("android"), "1B241KQ");
+        assert_eq!(resolved("web"), "chrome");
+        // "darwin" is the targetPlatform for desktop macOS.
+        assert_eq!(resolved("darwin"), "macos");
+    }
+
+    #[test]
+    fn exact_id_and_name_win_over_fuzzy() {
+        assert_eq!(resolved("chrome"), "chrome");
+        assert_eq!(resolved("macos"), "macos");
+        // Exact name, case-insensitive.
+        assert_eq!(resolved("Chrome"), "chrome");
+        assert_eq!(
+            resolved("iPhone SE (3rd generation)"),
+            "58BE4EB6-5BDE-4FD2-AB17-6046C3C05BC8"
+        );
+    }
+
+    #[test]
+    fn exact_id_beats_platform_alias() {
+        // "macos" is both a device id and a prefix of nothing else; the id must
+        // win so priority 1 is not shadowed by later rules.
+        assert_eq!(resolved("macos"), "macos");
+    }
+
+    #[test]
+    fn resolves_by_prefix_and_substring() {
+        // Name prefix.
+        assert_eq!(resolved("iphone"), "58BE4EB6-5BDE-4FD2-AB17-6046C3C05BC8");
+        // Id prefix.
+        assert_eq!(resolved("58BE"), "58BE4EB6-5BDE-4FD2-AB17-6046C3C05BC8");
+        // Id substring: Flutter's own matcher rejects "hrom", ours accepts it.
+        assert_eq!(resolved("hrom"), "chrome");
+        // Name substring.
+        assert_eq!(
+            resolved("generation"),
+            "58BE4EB6-5BDE-4FD2-AB17-6046C3C05BC8"
+        );
+    }
+
+    #[test]
+    fn unmatched_search_lists_available_devices() {
+        let err = match_device(&devices(), "zzq").expect_err("should not match");
+        assert!(err.starts_with("No device matching"), "got: {err}");
+        // The caller keys off this prefix to hard-fail instead of falling
+        // through, so both the prefix and the device list matter.
+        assert!(err.contains("chrome"), "got: {err}");
+        assert!(err.contains("Pixel 7"), "got: {err}");
+    }
+
+    #[test]
+    fn empty_device_list_falls_through() {
+        assert_eq!(match_device(&[], "ios"), Ok(None));
+    }
+
+    #[test]
+    fn empty_search_does_not_match_first_device() {
+        // An empty prefix would otherwise match everything.
+        assert_eq!(match_device(&devices(), ""), Ok(None));
+    }
+
+    #[test]
+    fn devices_missing_fields_do_not_panic() {
+        let partial = vec![json!({}), json!({"id": "chrome"})];
+        assert_eq!(match_device(&partial, "chrome"), Ok(Some("chrome".into())));
+    }
+
+    #[test]
+    fn parses_json_array_output() {
+        let out = r#"[{"id":"chrome","name":"Chrome"}]"#;
+        assert_eq!(parse_flutter_devices(out).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn parses_line_delimited_output() {
+        // Older Flutter versions emit one JSON object per line.
+        let out = "{\"id\":\"chrome\"}\n{\"id\":\"macos\"}\n";
+        assert_eq!(parse_flutter_devices(out).unwrap().len(), 2);
+    }
+
+    #[test]
+    fn rejects_non_json_output() {
+        assert!(parse_flutter_devices("Waiting for another flutter command...").is_err());
+    }
+
+    #[test]
+    fn detects_flutter_vs_dart_pubspec() {
+        assert!(is_top_level_flutter_pubspec(
+            "name: app\nflutter:\n  uses-material-design: true\n"
+        ));
+        // "flutter:" nested under dependencies is a package dep, not a Flutter app.
+        assert!(!is_top_level_flutter_pubspec(
+            "name: app\ndependencies:\n  flutter:\n    sdk: flutter\n"
+        ));
+    }
+
+    #[test]
+    fn detects_debug_type_from_program_path() {
+        assert_eq!(detect_debug_type("", Some("lib/main.dart")), "flutter");
+        assert_eq!(detect_debug_type("", Some("bin/server.dart")), "dart");
+        assert_eq!(detect_debug_type("", None), "dart");
+    }
+}

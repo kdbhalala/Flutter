@@ -31,6 +31,12 @@ jobs:
       - name: Build
         run: cargo build --release --target wasm32-wasip2
 
+      # Unit tests run on the host target, not wasm: they cover the pure
+      # helpers (device matching, `flutter devices` parsing, project-type
+      # detection) that need no Zed runtime.
+      - name: Test
+        run: cargo test --lib
+
       - name: Check formatting
         run: cargo fmt --check
 
