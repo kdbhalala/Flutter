@@ -149,21 +149,116 @@ fn parse_flutter_devices(stdout: &str) -> std::result::Result<Vec<serde_json::Va
     }
 }
 
-/// Mirrors the fuzzy matching of VSCode Dart-Code's `findBestDevice()`.
+/// Match a user-supplied device string against a `flutter devices --machine`
+/// list. Pure: no process execution, so it is unit-testable.
 ///
-/// Runs `flutter devices --machine`, parses the JSON device list, and
-/// finds the best match for `search` using the same priority order:
-///   1. Exact ID match
-///   2. Exact name match
+/// Mirrors the fuzzy matching of VSCode Dart-Code's `findBestDevice()`, plus
+/// the platform aliases the Flutter CLI itself accepts (`-d ios`).
+///
+/// Priority order:
+///   1. Exact ID
+///   2. Exact name
 ///   3. ID starts with search
 ///   4. Name starts with search
-///   5. ID contains search
-///   6. Name contains search
+///   5. Target platform starts with search (`ios`, `android`, `web`)
+///   6. ID contains search
+///   7. Name contains search
 ///
 /// Returns:
 ///   Ok(Some(id))  – resolved device ID
-///   Ok(None)      – no match found; caller should surface available devices
-///   Err(msg)      – flutter devices failed; caller should fall through
+///   Ok(None)      – device list was empty; caller should fall through
+///   Err(msg)      – list was non-empty but nothing matched; message lists devices
+fn match_device(
+    devices: &[serde_json::Value],
+    search: &str,
+) -> std::result::Result<Option<String>, String> {
+    let s = search.to_lowercase();
+
+    let id_of = |d: &serde_json::Value| {
+        d.get("id")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string()
+    };
+    let name_of = |d: &serde_json::Value| {
+        d.get("name")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_lowercase()
+    };
+    let id_lower = |d: &serde_json::Value| id_of(d).to_lowercase();
+    let platform_of = |d: &serde_json::Value| {
+        d.get("targetPlatform")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_lowercase()
+    };
+
+    // An empty search would prefix-match the first device of any list, which is
+    // never what the user meant.
+    if s.is_empty() {
+        return Ok(None);
+    }
+
+    // Priority 1 – exact ID
+    if let Some(d) = devices.iter().find(|d| id_lower(d) == s) {
+        return Ok(Some(id_of(d)));
+    }
+    // Priority 2 – exact name
+    if let Some(d) = devices.iter().find(|d| name_of(d) == s) {
+        return Ok(Some(id_of(d)));
+    }
+    // Priority 3 – ID starts with search
+    if let Some(d) = devices.iter().find(|d| id_lower(d).starts_with(&s)) {
+        return Ok(Some(id_of(d)));
+    }
+    // Priority 4 – name starts with search
+    if let Some(d) = devices.iter().find(|d| name_of(d).starts_with(&s)) {
+        return Ok(Some(id_of(d)));
+    }
+    // Priority 5 – platform alias, as the Flutter CLI accepts (`-d ios`,
+    // `-d android`, `-d web`). `targetPlatform` reads "ios", "android-arm64",
+    // "web-javascript", "darwin", so match on prefix. "macos" is not a
+    // targetPlatform value but is a device ID, so priority 1 already covers it.
+    if let Some(d) = devices.iter().find(|d| platform_of(d).starts_with(&s)) {
+        return Ok(Some(id_of(d)));
+    }
+    // Priority 6 – ID contains search
+    if let Some(d) = devices.iter().find(|d| id_lower(d).contains(&s)) {
+        return Ok(Some(id_of(d)));
+    }
+    // Priority 7 – name contains search
+    if let Some(d) = devices.iter().find(|d| name_of(d).contains(&s)) {
+        return Ok(Some(id_of(d)));
+    }
+
+    // No match – build a human-readable list of available device IDs.
+    let available: Vec<String> = devices
+        .iter()
+        .filter_map(|d| {
+            let id = d.get("id")?.as_str()?;
+            let name = d.get("name")?.as_str().unwrap_or("?");
+            Some(format!("  {id} ({name})"))
+        })
+        .collect();
+
+    if available.is_empty() {
+        Ok(None)
+    } else {
+        Err(format!(
+            "No device matching \"{search}\".\nAvailable devices:\n{}",
+            available.join("\n")
+        ))
+    }
+}
+
+/// Run `flutter devices --machine` and resolve `search` against the result.
+///
+/// Returns:
+///   Ok(Some(id))  – resolved device ID
+///   Ok(None)      – no devices attached; caller should fall through
+///   Err(msg)      – either the command failed, or nothing matched (the
+///                   "No device matching" prefix distinguishes the latter)
 fn resolve_device_id(
     worktree: &Worktree,
     tool: &str,
@@ -189,66 +284,7 @@ fn resolve_device_id(
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     let arr = parse_flutter_devices(stdout.trim())?;
-
-    let s = search.to_lowercase();
-
-    let id_of = |d: &serde_json::Value| {
-        d.get("id")
-            .and_then(|v| v.as_str())
-            .unwrap_or("")
-            .to_string()
-    };
-    let name_of = |d: &serde_json::Value| {
-        d.get("name")
-            .and_then(|v| v.as_str())
-            .unwrap_or("")
-            .to_lowercase()
-    };
-    let id_lower = |d: &serde_json::Value| id_of(d).to_lowercase();
-
-    // Priority 1 – exact ID
-    if let Some(d) = arr.iter().find(|d| id_lower(d) == s) {
-        return Ok(Some(id_of(d)));
-    }
-    // Priority 2 – exact name
-    if let Some(d) = arr.iter().find(|d| name_of(d) == s) {
-        return Ok(Some(id_of(d)));
-    }
-    // Priority 3 – ID starts with search
-    if let Some(d) = arr.iter().find(|d| id_lower(d).starts_with(&s)) {
-        return Ok(Some(id_of(d)));
-    }
-    // Priority 4 – name starts with search
-    if let Some(d) = arr.iter().find(|d| name_of(d).starts_with(&s)) {
-        return Ok(Some(id_of(d)));
-    }
-    // Priority 5 – ID contains search
-    if let Some(d) = arr.iter().find(|d| id_lower(d).contains(&s)) {
-        return Ok(Some(id_of(d)));
-    }
-    // Priority 6 – name contains search
-    if let Some(d) = arr.iter().find(|d| name_of(d).contains(&s)) {
-        return Ok(Some(id_of(d)));
-    }
-
-    // No match – build a human-readable list of available device IDs.
-    let available: Vec<String> = arr
-        .iter()
-        .filter_map(|d| {
-            let id = d.get("id")?.as_str()?;
-            let name = d.get("name")?.as_str().unwrap_or("?");
-            Some(format!("  {id} ({name})"))
-        })
-        .collect();
-
-    if available.is_empty() {
-        Ok(None)
-    } else {
-        Err(format!(
-            "No device matching \"{search}\".\nAvailable devices:\n{}",
-            available.join("\n")
-        ))
-    }
+    match_device(&arr, search)
 }
 
 impl FlutterExtension {
@@ -926,3 +962,4 @@ impl zed::Extension for FlutterExtension {
 }
 
 zed::register_extension!(FlutterExtension);
+
