@@ -1,15 +1,12 @@
-use std::collections::BTreeSet;
-
-use zed::lsp::CompletionKind;
+use zed::lsp::{CompletionKind, SymbolKind};
 use zed::settings::LspSettings;
 use zed::{CodeLabel, CodeLabelSpan};
 use zed_extension_api::process::Command;
 use zed_extension_api::serde_json::json;
 use zed_extension_api::{
     self as zed, current_platform, serde_json, DebugAdapterBinary, DebugConfig, DebugRequest,
-    DebugScenario, DebugTaskDefinition, Os, Result, SlashCommand, SlashCommandArgumentCompletion,
-    SlashCommandOutput, StartDebuggingRequestArguments, StartDebuggingRequestArgumentsRequest,
-    TaskTemplate, Worktree,
+    DebugScenario, DebugTaskDefinition, Os, Result, StartDebuggingRequestArguments,
+    StartDebuggingRequestArgumentsRequest, TaskTemplate, Worktree,
 };
 
 struct DartBinary {
@@ -120,12 +117,6 @@ fn flutter_tool_path(worktree: &Worktree, tool: &str, use_fvm: bool) -> String {
     tool.to_string()
 }
 
-fn slash_command_tool_path(worktree: Option<&Worktree>, tool: &str) -> String {
-    worktree
-        .and_then(|wt| wt.which(tool))
-        .unwrap_or_else(|| tool.to_string())
-}
-
 /// Read dart.env from LSP settings and return as env-var pairs injected into
 /// the language server and debug adapter processes.
 fn dart_extra_env(worktree: &Worktree) -> Vec<(String, String)> {
@@ -156,210 +147,6 @@ fn parse_flutter_devices(stdout: &str) -> std::result::Result<Vec<serde_json::Va
             .collect::<std::result::Result<_, _>>()
             .map_err(|e| format!("flutter devices output is not valid JSON: {e}")),
     }
-}
-
-fn slash_completion(
-    label: impl Into<String>,
-    new_text: impl Into<String>,
-) -> SlashCommandArgumentCompletion {
-    SlashCommandArgumentCompletion {
-        label: label.into(),
-        new_text: new_text.into(),
-        run_command: false,
-    }
-}
-
-fn push_token_completion(completions: &mut Vec<SlashCommandArgumentCompletion>, token: &str) {
-    completions.push(slash_completion(token, token));
-}
-
-fn flutter_device_slash_command_completions(use_fvm: bool) -> Vec<SlashCommandArgumentCompletion> {
-    let mut seen = BTreeSet::new();
-    let mut completions = Vec::new();
-
-    for alias in [
-        "chrome", "ios", "android", "macos", "linux", "windows", "web",
-    ] {
-        if seen.insert(alias.to_string()) {
-            completions.push(slash_completion(alias, alias));
-        }
-    }
-
-    let (os, _) = current_platform();
-    let flutter_tool = match os {
-        Os::Windows => "flutter.bat",
-        _ => "flutter",
-    };
-
-    let cmd = if use_fvm {
-        let command = Command::new("fvm");
-        command.arg("flutter")
-    } else {
-        Command::new(flutter_tool)
-    };
-
-    if let Ok(output) = cmd.args(["devices", "--machine"]).output() {
-        if output.status.unwrap_or(-1) == 0 {
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            if let Ok(devices) = parse_flutter_devices(stdout.trim()) {
-                for device in devices {
-                    if let Some(id) = device.get("id").and_then(|value| value.as_str()) {
-                        if seen.insert(id.to_string()) {
-                            let label = device
-                                .get("name")
-                                .and_then(|value| value.as_str())
-                                .map(|name| format!("{id} ({name})"))
-                                .unwrap_or_else(|| id.to_string());
-                            completions.push(slash_completion(label, id));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    completions
-}
-
-fn flutter_slash_command_completions(
-    args: &[String],
-    use_fvm: bool,
-) -> Vec<SlashCommandArgumentCompletion> {
-    let mut completions = Vec::new();
-
-    if args.is_empty() {
-        for token in [
-            "run",
-            "test",
-            "devices",
-            "doctor",
-            "devtools",
-            "attach",
-            "pub",
-            "emulators",
-            "clean",
-            "screenshot",
-            "gen-l10n",
-            "create",
-            "build",
-            "upgrade",
-        ] {
-            push_token_completion(&mut completions, token);
-        }
-        return completions;
-    }
-
-    if let Some(position) = args.iter().position(|arg| arg == "-d") {
-        if args.len() <= position + 2 {
-            return flutter_device_slash_command_completions(use_fvm);
-        }
-    }
-
-    if let Some(position) = args.iter().position(|arg| arg == "--web-renderer") {
-        if args.len() <= position + 2 {
-            for token in ["auto", "html", "canvaskit", "skwasm"] {
-                push_token_completion(&mut completions, token);
-            }
-            return completions;
-        }
-    }
-
-    match args[0].as_str() {
-        "run" if args.len() == 1 => {
-            for token in ["-d", "--release", "--web-renderer"] {
-                push_token_completion(&mut completions, token);
-            }
-        }
-        "test" if args.len() == 1 => {
-            push_token_completion(&mut completions, "--coverage");
-        }
-        "pub" => match args.len() {
-            1 => {
-                for token in ["get", "upgrade", "outdated", "run"] {
-                    push_token_completion(&mut completions, token);
-                }
-            }
-            2 if args[1] == "run" => {
-                push_token_completion(&mut completions, "build_runner");
-            }
-            3 if args[1] == "run" && args[2] == "build_runner" => {
-                for token in ["build", "watch"] {
-                    push_token_completion(&mut completions, token);
-                }
-            }
-            4 if args[1] == "run"
-                && args[2] == "build_runner"
-                && matches!(args[3].as_str(), "build" | "watch") =>
-            {
-                push_token_completion(&mut completions, "--delete-conflicting-outputs");
-            }
-            _ => {}
-        },
-        "build" => match args.len() {
-            1 => {
-                for token in ["apk", "appbundle", "ios", "ipa", "web"] {
-                    push_token_completion(&mut completions, token);
-                }
-            }
-            2 if matches!(args[1].as_str(), "apk" | "ios") => {
-                push_token_completion(&mut completions, "--release");
-            }
-            _ => {}
-        },
-        _ => {}
-    }
-
-    completions
-}
-
-fn dart_slash_command_completions(args: &[String]) -> Vec<SlashCommandArgumentCompletion> {
-    let mut completions = Vec::new();
-
-    if args.is_empty() {
-        for token in [
-            "run", "test", "analyze", "format", "fix", "pub", "devtools", "create", "compile",
-            "doc",
-        ] {
-            push_token_completion(&mut completions, token);
-        }
-        return completions;
-    }
-
-    match args[0].as_str() {
-        "run" => match args.len() {
-            1 => push_token_completion(&mut completions, "build_runner"),
-            2 if args[1] == "build_runner" => {
-                for token in ["build", "watch"] {
-                    push_token_completion(&mut completions, token);
-                }
-            }
-            3 if args[1] == "build_runner" && matches!(args[2].as_str(), "build" | "watch") => {
-                push_token_completion(&mut completions, "--delete-conflicting-outputs");
-            }
-            _ => {}
-        },
-        "test" if args.len() == 1 => {
-            push_token_completion(&mut completions, "--coverage=coverage");
-        }
-        "fix" if args.len() == 1 => {
-            push_token_completion(&mut completions, "--apply");
-        }
-        "pub" => match args.len() {
-            1 => {
-                for token in ["get", "upgrade", "outdated", "cache"] {
-                    push_token_completion(&mut completions, token);
-                }
-            }
-            2 if args[1] == "cache" => push_token_completion(&mut completions, "repair"),
-            _ => {}
-        },
-        "compile" if args.len() == 1 => {
-            push_token_completion(&mut completions, "exe");
-        }
-        _ => {}
-    }
-
-    completions
 }
 
 /// Mirrors the fuzzy matching of VSCode Dart-Code's `findBestDevice()`.
@@ -992,65 +779,34 @@ impl zed::Extension for FlutterExtension {
         }
     }
 
-    fn complete_slash_command_argument(
+    fn label_for_symbol(
         &self,
-        command: SlashCommand,
-        args: Vec<String>,
-    ) -> Result<Vec<SlashCommandArgumentCompletion>, String> {
-        match command.name.as_str() {
-            "flutter" => Ok(flutter_slash_command_completions(&args, false)),
-            "dart" => Ok(dart_slash_command_completions(&args)),
-            "fvm" => {
-                if args.is_empty() {
-                    Ok(vec![slash_completion("flutter", "flutter")])
-                } else if args.len() == 1 && args[0] == "flutter" {
-                    Ok(flutter_slash_command_completions(&[], true))
-                } else if !args.is_empty() && args[0] == "flutter" {
-                    Ok(flutter_slash_command_completions(&args[1..], true))
-                } else {
-                    Ok(Vec::new())
-                }
-            }
-            _ => Ok(Vec::new()),
-        }
-    }
-
-    fn run_slash_command(
-        &self,
-        command: SlashCommand,
-        args: Vec<String>,
-        worktree: Option<&Worktree>,
-    ) -> Result<SlashCommandOutput, String> {
-        let tool = match command.name.as_str() {
-            "flutter" => "flutter",
-            "dart" => "dart",
-            "fvm" => "fvm",
-            other => return Err(format!("Unsupported slash command: {other}")),
+        _language_server_id: &zed::LanguageServerId,
+        symbol: zed::lsp::Symbol,
+    ) -> Option<CodeLabel> {
+        let highlight = match symbol.kind {
+            SymbolKind::Class
+            | SymbolKind::Interface
+            | SymbolKind::Enum
+            | SymbolKind::Struct
+            | SymbolKind::TypeParameter => "type",
+            SymbolKind::Function | SymbolKind::Method => "function",
+            SymbolKind::Constructor => "constructor",
+            SymbolKind::Property | SymbolKind::Field => "property",
+            SymbolKind::Variable => "variable",
+            SymbolKind::EnumMember | SymbolKind::Constant => "constant",
+            SymbolKind::Module | SymbolKind::Namespace | SymbolKind::Package => "keyword.import",
+            SymbolKind::String => "string",
+            SymbolKind::Number | SymbolKind::Boolean => "number",
+            SymbolKind::Operator => "operator",
+            _ => return None,
         };
 
-        let path = slash_command_tool_path(worktree, tool);
-        let output = Command::new(&path)
-            .args(args.clone())
-            .output()
-            .map_err(|e| format!("Failed to spawn {tool}: {e}"))?;
-
-        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-        let text = if !stdout.trim().is_empty() {
-            stdout
-        } else if !stderr.trim().is_empty() {
-            stderr
-        } else {
-            String::from("Command completed successfully.")
-        };
-
-        if output.status.unwrap_or(-1) != 0 {
-            return Err(text.to_string());
-        }
-
-        Ok(SlashCommandOutput {
-            text,
-            sections: Vec::new(),
+        let name = symbol.name;
+        Some(CodeLabel {
+            filter_range: (0..name.len()).into(),
+            spans: vec![CodeLabelSpan::literal(name, Some(highlight.into()))],
+            code: String::new(),
         })
     }
 

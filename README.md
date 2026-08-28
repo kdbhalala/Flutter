@@ -1,6 +1,6 @@
 # Flutter for Zed
 
-Flutter and Dart support for the [Zed](https://zed.dev) editor — LSP, syntax highlighting, debugging, tasks, and slash commands.
+Flutter and Dart support for the [Zed](https://zed.dev) editor — LSP, syntax highlighting, debugging, and tasks.
 
 ---
 
@@ -16,9 +16,9 @@ Flutter and Dart support for the [Zed](https://zed.dev) editor — LSP, syntax h
 | **Snippets** | 130+ snippets — Dart, Flutter widgets, lifecycle, BLoC, Riverpod, Provider, Freezed, go_router, json_serializable, CustomPainter, InheritedWidget |
 | **Debug locator** | Auto-converts `flutter run` / `dart run` tasks to debug sessions — no manual `.zed/debug.json` needed |
 | **Debugging** | Flutter and Dart debug adapter (DAP) — launch and attach, FVM, Puro, and Proto aware |
+| **Inline debug values** | Variable values shown inline and on hover while paused, for parameters, locals, fields, loop and pattern variables |
 | **Tasks** | 50+ built-in tasks for Flutter, Dart, and FVM workflows including build_runner, coverage, web |
 | **Runnables** | `main()`, `test()`, `testWidgets()`, `testGoldens()`, `patrolTest()`, `blocTest()`, and `group()` detected as runnable in the editor gutter |
-| **Slash commands** | `/flutter`, `/dart`, `/fvm` in the Zed assistant with devtools and build runner support |
 | **Version Manager support** | Project-local `.fvm` symlink, FVM, Puro, Proto, asdf, and mise auto-detected |
 | **SDK auto-detection** | Finds SDK via LSP settings → local `.fvm` → Puro → Proto → PATH → `FLUTTER_ROOT` → asdf → mise |
 | **Rich completions** | Typed labels for Class, Function, Constructor, Method, Property, Variable, Enum, Field, Module |
@@ -219,15 +219,6 @@ Run via `cmd+shift+p` → **"task: spawn"**.
 | dart: pub upgrade | `dart pub upgrade` |
 | dart: build_runner build | `dart run build_runner build --delete-conflicting-outputs` |
 | dart: build_runner watch | `dart run build_runner watch --delete-conflicting-outputs` |
-
----
-
-## Slash Commands in Assistant
-
-Use in the Zed AI assistant panel:
-- **`/flutter <subcommand>`**: Token completions for `run`, `test`, `devices`, `doctor`, `devtools`, `pub`, `clean`, `build`, etc.
-- **`/dart <subcommand>`**: Token completions for `run`, `test`, `analyze`, `format`, `fix`, `pub`, `devtools`, `compile`, etc.
-- **`/fvm flutter <subcommand>`**: Runs FVM-managed Flutter commands with full completion support.
 
 ---
 

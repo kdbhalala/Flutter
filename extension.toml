@@ -1,6 +1,6 @@
 id = "flutter"
 name = "Flutter"
-description = "Full Flutter and Dart support for Zed: LSP (dart analysis server), syntax highlighting, code outline, snippets, tasks, slash commands, hot-reload debugging (Flutter DAP), and Dart CLI debugging."
+description = "Full Flutter and Dart support for Zed: LSP (dart analysis server), syntax highlighting, code outline, snippets, tasks, hot-reload debugging (Flutter DAP), and Dart CLI debugging."
 version = "0.2.0"
 schema_version = 1
 authors = ["Krunal Bhalala <kdbhalala@gmail.com>"]
@@ -14,19 +14,24 @@ languages = ["Dart"]
 repository = "https://github.com/UserNobody14/tree-sitter-dart"
 rev = "80e23c07b64494f7e21090bb3450223ef0b192f4"
 
-[slash_commands.flutter]
-description = "Run Flutter CLI commands"
-requires_argument = true
-
-[slash_commands.fvm]
-description = "Run FVM-managed Flutter CLI commands"
-requires_argument = true
-
-[slash_commands.dart]
-description = "Run Dart CLI commands (analyze, test, format, pub, etc.)"
-requires_argument = true
-
 [debug_adapters.Dart]
 schema_path = "debug_adapter_schemas/Dart.json"
 
 [debug_locators.dart]
+
+# The only `process::Command` exec in this extension is `resolve_device_id`,
+# which runs `<flutter> devices --machine` (or `<fvm> flutter devices --machine`).
+# The binary is resolved at runtime to an absolute path (LSP settings, .fvm,
+# Puro, Proto, PATH, FLUTTER_ROOT, asdf, mise), and Zed matches `command` by
+# exact string, so the path cannot be enumerated here. The arguments are the
+# real constraint instead.
+[[capabilities]]
+kind = "process:exec"
+command = "*"
+args = ["devices", "--machine"]
+
+# fvm form: `fvm flutter devices --machine` (arg0 is flutter/flutter.bat/dart).
+[[capabilities]]
+kind = "process:exec"
+command = "*"
+args = ["*", "devices", "--machine"]

@@ -1,12 +1,16 @@
 name = "Dart"
 grammar = "dart"
 path_suffixes = ["dart"]
+modeline_aliases = ["dart"]
 line_comments = ["// ", "/// "]
 tab_size = 2
 hard_tabs = false
 autoclose_before = ";:.,=}])>"
 word_characters = ["_", "$"]
 debuggers = ["Dart"]
+collapsed_placeholder = " /* ... */ "
+block_comment = { start = "/*", prefix = "* ", end = "*/", tab_size = 1 }
+documentation_comment = { start = "/**", prefix = "* ", end = "*/", tab_size = 1 }
 
 brackets = [
     { start = "{", end = "}", close = true, newline = true },
