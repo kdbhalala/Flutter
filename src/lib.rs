@@ -81,7 +81,7 @@ fn find_version_manager_tool(worktree: &Worktree, tool: &str) -> Option<String> 
     let (_, home) = env.iter().find(|(k, _)| k == "HOME")?;
 
     // 2. Global FVM, Puro, Proto, asdf, mise
-    for candidate in [
+    [
         format!("{}/.fvm/default/bin/{}", home, tool),
         format!("{}/.puro/envs/default/bin/{}", home, tool),
         format!("{}/.puro/bin/{}", home, tool),
@@ -89,12 +89,9 @@ fn find_version_manager_tool(worktree: &Worktree, tool: &str) -> Option<String> 
         format!("{}/.proto/bin/{}", home, tool),
         format!("{}/.asdf/shims/{}", home, tool),
         format!("{}/.local/share/mise/shims/{}", home, tool),
-    ] {
-        if std::path::Path::new(&candidate).exists() {
-            return Some(candidate);
-        }
-    }
-    None
+    ]
+    .into_iter()
+    .find(|candidate| std::path::Path::new(candidate).exists())
 }
 
 /// Resolve flutter/dart tool path with priority:
@@ -180,7 +177,9 @@ fn flutter_device_slash_command_completions(use_fvm: bool) -> Vec<SlashCommandAr
     let mut seen = BTreeSet::new();
     let mut completions = Vec::new();
 
-    for alias in ["chrome", "ios", "android", "macos", "linux", "windows", "web"] {
+    for alias in [
+        "chrome", "ios", "android", "macos", "linux", "windows", "web",
+    ] {
         if seen.insert(alias.to_string()) {
             completions.push(slash_completion(alias, alias));
         }
@@ -318,15 +317,7 @@ fn dart_slash_command_completions(args: &[String]) -> Vec<SlashCommandArgumentCo
 
     if args.is_empty() {
         for token in [
-            "run",
-            "test",
-            "analyze",
-            "format",
-            "fix",
-            "pub",
-            "devtools",
-            "create",
-            "compile",
+            "run", "test", "analyze", "format", "fix", "pub", "devtools", "create", "compile",
             "doc",
         ] {
             push_token_completion(&mut completions, token);
