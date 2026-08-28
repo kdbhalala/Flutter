@@ -8,8 +8,8 @@ Cargo.lock
 #caveman
 .agents/
 
-# code-review-graph
-.code-review-graph/
+# codegraph
+.codegraph/
 .mcp.json
 
 # Claude/Copilot AI assistant config
