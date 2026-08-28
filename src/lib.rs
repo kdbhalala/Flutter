@@ -546,9 +546,16 @@ impl zed::Extension for FlutterExtension {
                     // Device list was retrieved but search had no match.
                     return Err(msg);
                 }
-                Err(_) => {
-                    // flutter devices failed (not in PATH, SDK issue, etc.).
-                    // Fall through with the raw value so the DAP gives its own error.
+                Err(msg) => {
+                    // `flutter devices` could not be run at all: SDK missing, or
+                    // the process:exec capability was refused. Fall through with
+                    // the raw value so the Flutter DAP can still do its own device
+                    // matching -- but say so, because a silent fall-through here is
+                    // indistinguishable from a successful resolve at the UI level.
+                    eprintln!(
+                        "[flutter] could not resolve device_id {search:?}: {msg}. \
+                         Passing it to the Flutter DAP unresolved."
+                    );
                     Some(search.to_string())
                 }
             }
@@ -962,4 +969,3 @@ impl zed::Extension for FlutterExtension {
 }
 
 zed::register_extension!(FlutterExtension);
-
